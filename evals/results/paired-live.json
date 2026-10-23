@@ -1,0 +1,2822 @@
+{
+  "schema_version": 1,
+  "kind": "paired_comparison",
+  "real_api_used": true,
+  "created_at": "2026-10-17T02:31:13.011956+00:00",
+  "suite_id": "paired-20261017-v1",
+  "suite_sha256": "e9a4e03163fbee4836125421abd916a3a8c4ac202a6ed6aed872b2141ebe0ffb",
+  "frozen_at": "2026-10-17T02:29:34.165277+00:00",
+  "model": "deepseek-flash",
+  "temperature": 0.1,
+  "repetitions": 1,
+  "policy": {
+    "max_calls": 96,
+    "max_tokens": 220000,
+    "direct_inferences": 1,
+    "workflow_max_calls_per_task": 18,
+    "parallel_checks": true,
+    "extension_nodes": [
+      "acceptance_explainer"
+    ],
+    "timing": "arm wall time, includes internal workflow checks, excludes independent post-run audits",
+    "holdout": "executed only after both arms finish; never fed back to models"
+  },
+  "planned_case_ids": [
+    "clamp_bounds_and_exception",
+    "merge_intervals_without_mutation",
+    "moving_average_last_window_and_bool",
+    "orders_clean_no_unnecessary_change",
+    "rotate_fresh_v1",
+    "chunks_fresh_v1",
+    "decode_fresh_v1",
+    "overlap_fresh_v1"
+  ],
+  "entries": [
+    {
+      "id": "clamp_bounds_and_exception",
+      "split": "development",
+      "task_id": "clamp-v1",
+      "task": "实现 clamp(value, lower, upper)：整数上下限内返回 value，越界返回对应边界；lower>upper 时抛 ValueError。",
+      "source": "def clamp(value, lower, upper):\n    return min(lower, max(value, upper))\n",
+      "contract_hash": "d91c2212573347e689f2043534de4508560786968b4d96e0f85433896b476727",
+      "direct": {
+        "status": "completed",
+        "error_type": "",
+        "code": "def clamp(value, lower, upper):\n    if lower > upper:\n        raise ValueError(\"lower must not be greater than upper\")\n    return min(upper, max(lower, value))\n",
+        "elapsed_seconds": 1.460355,
+        "metrics": {
+          "model_calls": 1,
+          "http_attempts": 1,
+          "prompt_tokens": 364,
+          "completion_tokens": 81
+        },
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "inside",
+                "name": "inside",
+                "status": "passed",
+                "detail": "实际返回 3",
+                "expected": "3",
+                "actual": 3
+              },
+              {
+                "id": "below",
+                "name": "below",
+                "status": "passed",
+                "detail": "实际返回 0",
+                "expected": "0",
+                "actual": 0
+              },
+              {
+                "id": "bad_range",
+                "name": "bad_range",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "35a6cf85f5060cbbdb104564f21ae2fb10384235d96495db629d04086908af53",
+            "acceptance_id": "clamp-v1",
+            "elapsed_seconds": 0.4262
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "above",
+                "name": "above",
+                "status": "passed",
+                "detail": "实际返回 4",
+                "expected": "4",
+                "actual": 4
+              },
+              {
+                "id": "equal",
+                "name": "equal",
+                "status": "passed",
+                "detail": "实际返回 2",
+                "expected": "2",
+                "actual": 2
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "35a6cf85f5060cbbdb104564f21ae2fb10384235d96495db629d04086908af53",
+            "acceptance_id": "clamp-v1",
+            "elapsed_seconds": 0.4111
+          }
+        }
+      },
+      "workflow": {
+        "run_id": "e1745fa42e0047d6ab6b6be858c48f9f",
+        "status": "completed_verified",
+        "termination_reason": "frozen_acceptance_passed",
+        "code": "def clamp(value, lower, upper):\n    if lower > upper:\n        raise ValueError(\"lower must not be greater than upper\")\n    return min(upper, max(value, lower))\n",
+        "elapsed_seconds": 20.098909,
+        "metrics": {
+          "model_calls": 10,
+          "http_attempts": 10,
+          "prompt_tokens": 23219,
+          "completion_tokens": 2355,
+          "tool_calls": 4,
+          "active_seconds": 19.968,
+          "scripted_actions": 0
+        },
+        "roles_executed": [
+          "acceptance_explainer",
+          "fix",
+          "gate",
+          "inspect",
+          "review",
+          "validate"
+        ],
+        "versions": 2,
+        "fix_rounds": 1,
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "inside",
+                "name": "inside",
+                "status": "passed",
+                "detail": "实际返回 3",
+                "expected": "3",
+                "actual": 3
+              },
+              {
+                "id": "below",
+                "name": "below",
+                "status": "passed",
+                "detail": "实际返回 0",
+                "expected": "0",
+                "actual": 0
+              },
+              {
+                "id": "bad_range",
+                "name": "bad_range",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "3e35b533fe769c6a0e5a36009f7e5e0ce7c2f67f694739a2b757cdb257dac5c9",
+            "acceptance_id": "clamp-v1",
+            "elapsed_seconds": 0.3887
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "above",
+                "name": "above",
+                "status": "passed",
+                "detail": "实际返回 4",
+                "expected": "4",
+                "actual": 4
+              },
+              {
+                "id": "equal",
+                "name": "equal",
+                "status": "passed",
+                "detail": "实际返回 2",
+                "expected": "2",
+                "actual": 2
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "3e35b533fe769c6a0e5a36009f7e5e0ce7c2f67f694739a2b757cdb257dac5c9",
+            "acceptance_id": "clamp-v1",
+            "elapsed_seconds": 0.41
+          }
+        }
+      },
+      "initial": {
+        "code": "def clamp(value, lower, upper):\n    return min(lower, max(value, upper))\n",
+        "audits": {
+          "public": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "inside",
+                "name": "inside",
+                "status": "failed",
+                "detail": "实际返回 0",
+                "expected": "3",
+                "actual": 0
+              },
+              {
+                "id": "below",
+                "name": "below",
+                "status": "passed",
+                "detail": "实际返回 0",
+                "expected": "0",
+                "actual": 0
+              },
+              {
+                "id": "bad_range",
+                "name": "bad_range",
+                "status": "failed",
+                "detail": "实际返回 2",
+                "expected": "ValueError",
+                "actual": 2
+              }
+            ],
+            "passed_count": 1,
+            "failed_count": 2,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "4e5a8fb24a45accfa4ae5b342b80b9da1ab5401cf23af1887cbb4ee3bbae3f58",
+            "acceptance_id": "clamp-v1",
+            "elapsed_seconds": 0.3801
+          },
+          "holdout": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "above",
+                "name": "above",
+                "status": "failed",
+                "detail": "实际返回 -3",
+                "expected": "4",
+                "actual": -3
+              },
+              {
+                "id": "equal",
+                "name": "equal",
+                "status": "passed",
+                "detail": "实际返回 2",
+                "expected": "2",
+                "actual": 2
+              }
+            ],
+            "passed_count": 1,
+            "failed_count": 1,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "4e5a8fb24a45accfa4ae5b342b80b9da1ab5401cf23af1887cbb4ee3bbae3f58",
+            "acceptance_id": "clamp-v1",
+            "elapsed_seconds": 0.4268
+          }
+        }
+      },
+      "execution_order": [
+        "direct",
+        "workflow"
+      ]
+    },
+    {
+      "id": "merge_intervals_without_mutation",
+      "split": "development",
+      "task_id": "merge-intervals-v1",
+      "task": "实现 merge_intervals(intervals)：输入整数闭区间的二元列表，按起点排序合并重叠或端点相同的区间；start>end 抛 ValueError；不修改输入。空输入返回空列表。",
+      "source": "def merge_intervals(intervals):\n    intervals.sort()\n    result = []\n    for start, end in intervals:\n        if result and start < result[-1][1]:\n            result[-1][1] = end\n        else:\n            result.append([start, end])\n    return result\n",
+      "contract_hash": "0d00ddd4f6b45183fdcf47e9f0bce8af922c082edce61597e01514496d4be6b2",
+      "direct": {
+        "status": "completed",
+        "error_type": "",
+        "code": "def merge_intervals(intervals):\n    \"\"\"Merge overlapping or touching closed integer intervals.\n\n    Args:\n        intervals: list of [start, end] pairs (closed intervals).\n\n    Returns:\n        A new list of merged [start, end] pairs sorted by start.\n\n    Raises:\n        ValueError: if any interval has start > end.\n    \"\"\"\n    normalized = []\n    for interval in intervals:\n        start, end = interval\n        if start > end:\n            raise ValueError(\n                \"invalid interval: start %r > end %r\" % (start, end)\n            )\n        normalized.append([start, end])\n\n    normalized.sort(key=lambda pair: pair[0])\n\n    result = []\n    for start, end in normalized:\n        if result and start <= result[-1][1]:\n            if end > result[-1][1]:\n                result[-1][1] = end\n        else:\n            result.append([start, end])\n    return result\n",
+        "elapsed_seconds": 1.441776,
+        "metrics": {
+          "model_calls": 1,
+          "http_attempts": 1,
+          "prompt_tokens": 439,
+          "completion_tokens": 305
+        },
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "empty",
+                "name": "empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "overlap",
+                "name": "overlap",
+                "status": "passed",
+                "detail": "实际返回 [[1, 5]]",
+                "expected": "[[1, 5]]",
+                "actual": [
+                  [
+                    1,
+                    5
+                  ]
+                ]
+              },
+              {
+                "id": "invalid",
+                "name": "invalid",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "c4f2d9d5b06075cb115a4c5976e7e595bd078a83546c21b01e17708c25c862bd",
+            "acceptance_id": "merge-intervals-v1",
+            "elapsed_seconds": 0.7114
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "nested",
+                "name": "nested",
+                "status": "passed",
+                "detail": "实际返回 [[1, 8], [10, 11]]",
+                "expected": "[[1, 8], [10, 11]]",
+                "actual": [
+                  [
+                    1,
+                    8
+                  ],
+                  [
+                    10,
+                    11
+                  ]
+                ]
+              },
+              {
+                "id": "separate",
+                "name": "separate",
+                "status": "passed",
+                "detail": "实际返回 [[1, 2], [3, 4]]",
+                "expected": "[[1, 2], [3, 4]]",
+                "actual": [
+                  [
+                    1,
+                    2
+                  ],
+                  [
+                    3,
+                    4
+                  ]
+                ]
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "c4f2d9d5b06075cb115a4c5976e7e595bd078a83546c21b01e17708c25c862bd",
+            "acceptance_id": "merge-intervals-v1",
+            "elapsed_seconds": 0.3825
+          }
+        }
+      },
+      "workflow": {
+        "run_id": "fe2c5e3551a74a9da68b0d5405e58dad",
+        "status": "completed_verified",
+        "termination_reason": "frozen_acceptance_passed",
+        "code": "def merge_intervals(intervals):\n    ordered = sorted(intervals)\n    for start, end in ordered:\n        if start > end:\n            raise ValueError(f\"invalid interval: {start}, {end}\")\n    result = []\n    for start, end in ordered:\n        if result and start <= result[-1][1]:\n            result[-1][1] = max(result[-1][1], end)\n        else:\n            result.append([start, end])\n    return result\n",
+        "elapsed_seconds": 23.339503,
+        "metrics": {
+          "model_calls": 10,
+          "http_attempts": 10,
+          "prompt_tokens": 25839,
+          "completion_tokens": 3011,
+          "tool_calls": 4,
+          "active_seconds": 23.233,
+          "scripted_actions": 0
+        },
+        "roles_executed": [
+          "acceptance_explainer",
+          "fix",
+          "gate",
+          "inspect",
+          "review",
+          "validate"
+        ],
+        "versions": 2,
+        "fix_rounds": 1,
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "empty",
+                "name": "empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "overlap",
+                "name": "overlap",
+                "status": "passed",
+                "detail": "实际返回 [[1, 5]]",
+                "expected": "[[1, 5]]",
+                "actual": [
+                  [
+                    1,
+                    5
+                  ]
+                ]
+              },
+              {
+                "id": "invalid",
+                "name": "invalid",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "963049e8909c8317052fca9a3dec9bfe4e5b1bfabce20084c27b0b14f854d686",
+            "acceptance_id": "merge-intervals-v1",
+            "elapsed_seconds": 0.3888
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "nested",
+                "name": "nested",
+                "status": "passed",
+                "detail": "实际返回 [[1, 8], [10, 11]]",
+                "expected": "[[1, 8], [10, 11]]",
+                "actual": [
+                  [
+                    1,
+                    8
+                  ],
+                  [
+                    10,
+                    11
+                  ]
+                ]
+              },
+              {
+                "id": "separate",
+                "name": "separate",
+                "status": "passed",
+                "detail": "实际返回 [[1, 2], [3, 4]]",
+                "expected": "[[1, 2], [3, 4]]",
+                "actual": [
+                  [
+                    1,
+                    2
+                  ],
+                  [
+                    3,
+                    4
+                  ]
+                ]
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "963049e8909c8317052fca9a3dec9bfe4e5b1bfabce20084c27b0b14f854d686",
+            "acceptance_id": "merge-intervals-v1",
+            "elapsed_seconds": 0.3722
+          }
+        }
+      },
+      "initial": {
+        "code": "def merge_intervals(intervals):\n    intervals.sort()\n    result = []\n    for start, end in intervals:\n        if result and start < result[-1][1]:\n            result[-1][1] = end\n        else:\n            result.append([start, end])\n    return result\n",
+        "audits": {
+          "public": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "empty",
+                "name": "empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "overlap",
+                "name": "overlap",
+                "status": "failed",
+                "detail": "实际返回 [[1, 3], [3, 5]]；输入被修改",
+                "expected": "[[1, 5]]",
+                "actual": [
+                  [
+                    1,
+                    3
+                  ],
+                  [
+                    3,
+                    5
+                  ]
+                ]
+              },
+              {
+                "id": "invalid",
+                "name": "invalid",
+                "status": "failed",
+                "detail": "实际返回 [[3, 1]]",
+                "expected": "ValueError",
+                "actual": [
+                  [
+                    3,
+                    1
+                  ]
+                ]
+              }
+            ],
+            "passed_count": 1,
+            "failed_count": 2,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "28aa8c7224ee79382415cccadfb223187f26768b2cf2875441989960e2f8e7ba",
+            "acceptance_id": "merge-intervals-v1",
+            "elapsed_seconds": 0.3843
+          },
+          "holdout": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "nested",
+                "name": "nested",
+                "status": "failed",
+                "detail": "实际返回 [[1, 3], [10, 11]]",
+                "expected": "[[1, 8], [10, 11]]",
+                "actual": [
+                  [
+                    1,
+                    3
+                  ],
+                  [
+                    10,
+                    11
+                  ]
+                ]
+              },
+              {
+                "id": "separate",
+                "name": "separate",
+                "status": "failed",
+                "detail": "实际返回 [[1, 2], [3, 4]]；输入被修改",
+                "expected": "[[1, 2], [3, 4]]",
+                "actual": [
+                  [
+                    1,
+                    2
+                  ],
+                  [
+                    3,
+                    4
+                  ]
+                ]
+              }
+            ],
+            "passed_count": 0,
+            "failed_count": 2,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "28aa8c7224ee79382415cccadfb223187f26768b2cf2875441989960e2f8e7ba",
+            "acceptance_id": "merge-intervals-v1",
+            "elapsed_seconds": 0.3971
+          }
+        }
+      },
+      "execution_order": [
+        "workflow",
+        "direct"
+      ]
+    },
+    {
+      "id": "moving_average_last_window_and_bool",
+      "split": "development",
+      "task_id": "moving-average-v1",
+      "task": "实现 moving_average(values, window)：有限数值列表，返回每个完整窗口的均值列表；window 必须为正整数且 bool 不算整数，否则抛 ValueError；长度不足返回空列表，不修改输入。",
+      "source": "def moving_average(values, window):\n    if window <= 0:\n        raise ValueError('invalid window')\n    return [sum(values[i:i + window]) / window for i in range(len(values) - window)]\n",
+      "contract_hash": "a91d8c6bf016053a01c9cdb08d39e6ee84b6de0352399ab732a03ff0e009d603",
+      "direct": {
+        "status": "completed",
+        "error_type": "",
+        "code": "def moving_average(values, window):\n    if isinstance(window, bool) or not isinstance(window, int) or window <= 0:\n        raise ValueError('invalid window')\n    n = len(values)\n    if n < window:\n        return []\n    return [sum(values[i:i + window]) / window for i in range(n - window + 1)]\n",
+        "elapsed_seconds": 0.910896,
+        "metrics": {
+          "model_calls": 1,
+          "http_attempts": 1,
+          "prompt_tokens": 422,
+          "completion_tokens": 133
+        },
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "empty",
+                "name": "empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "normal",
+                "name": "normal",
+                "status": "passed",
+                "detail": "实际返回 [1.5, 2.5]",
+                "expected": "[1.5, 2.5]",
+                "actual": [
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "invalid",
+                "name": "invalid",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "529e046ce475dd62319d646b9a38ac55612d06e5f43c7c8568901ee408764c8a",
+            "acceptance_id": "moving-average-v1",
+            "elapsed_seconds": 0.4239
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "too_short",
+                "name": "too_short",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "bool_window",
+                "name": "bool_window",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "unit",
+                "name": "unit",
+                "status": "passed",
+                "detail": "实际返回 [2.0, -2.0]",
+                "expected": "[2.0, -2.0]",
+                "actual": [
+                  2.0,
+                  -2.0
+                ]
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "529e046ce475dd62319d646b9a38ac55612d06e5f43c7c8568901ee408764c8a",
+            "acceptance_id": "moving-average-v1",
+            "elapsed_seconds": 0.4321
+          }
+        }
+      },
+      "workflow": {
+        "run_id": "a78d614ab22c444284b64778602ffdaa",
+        "status": "completed_verified",
+        "termination_reason": "frozen_acceptance_passed",
+        "code": "def moving_average(values, window):\n    if isinstance(window, bool) or not isinstance(window, int) or window <= 0:\n        raise ValueError('invalid window')\n    return [sum(values[i:i + window]) / window for i in range(len(values) - window + 1)]\n",
+        "elapsed_seconds": 22.786319,
+        "metrics": {
+          "model_calls": 10,
+          "http_attempts": 10,
+          "prompt_tokens": 24020,
+          "completion_tokens": 2730,
+          "tool_calls": 4,
+          "active_seconds": 22.672,
+          "scripted_actions": 0
+        },
+        "roles_executed": [
+          "acceptance_explainer",
+          "fix",
+          "gate",
+          "inspect",
+          "review",
+          "validate"
+        ],
+        "versions": 2,
+        "fix_rounds": 1,
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "empty",
+                "name": "empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "normal",
+                "name": "normal",
+                "status": "passed",
+                "detail": "实际返回 [1.5, 2.5]",
+                "expected": "[1.5, 2.5]",
+                "actual": [
+                  1.5,
+                  2.5
+                ]
+              },
+              {
+                "id": "invalid",
+                "name": "invalid",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "b19754f4e93421997068df620248269e61537c9fba7f20bcf2009daead38b7bd",
+            "acceptance_id": "moving-average-v1",
+            "elapsed_seconds": 0.4253
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "too_short",
+                "name": "too_short",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "bool_window",
+                "name": "bool_window",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "unit",
+                "name": "unit",
+                "status": "passed",
+                "detail": "实际返回 [2.0, -2.0]",
+                "expected": "[2.0, -2.0]",
+                "actual": [
+                  2.0,
+                  -2.0
+                ]
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "b19754f4e93421997068df620248269e61537c9fba7f20bcf2009daead38b7bd",
+            "acceptance_id": "moving-average-v1",
+            "elapsed_seconds": 0.4245
+          }
+        }
+      },
+      "initial": {
+        "code": "def moving_average(values, window):\n    if window <= 0:\n        raise ValueError('invalid window')\n    return [sum(values[i:i + window]) / window for i in range(len(values) - window)]\n",
+        "audits": {
+          "public": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "empty",
+                "name": "empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "normal",
+                "name": "normal",
+                "status": "failed",
+                "detail": "实际返回 [1.5]",
+                "expected": "[1.5, 2.5]",
+                "actual": [
+                  1.5
+                ]
+              },
+              {
+                "id": "invalid",
+                "name": "invalid",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 1,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "5fd42907cea2583fabcebf413ec9b6f7a2677b35ab15e9b1ad4b2acf5f622632",
+            "acceptance_id": "moving-average-v1",
+            "elapsed_seconds": 0.4113
+          },
+          "holdout": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "too_short",
+                "name": "too_short",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "bool_window",
+                "name": "bool_window",
+                "status": "failed",
+                "detail": "实际返回 []",
+                "expected": "ValueError",
+                "actual": []
+              },
+              {
+                "id": "unit",
+                "name": "unit",
+                "status": "failed",
+                "detail": "实际返回 [2.0]",
+                "expected": "[2.0, -2.0]",
+                "actual": [
+                  2.0
+                ]
+              }
+            ],
+            "passed_count": 1,
+            "failed_count": 2,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "5fd42907cea2583fabcebf413ec9b6f7a2677b35ab15e9b1ad4b2acf5f622632",
+            "acceptance_id": "moving-average-v1",
+            "elapsed_seconds": 0.4322
+          }
+        }
+      },
+      "execution_order": [
+        "direct",
+        "workflow"
+      ]
+    },
+    {
+      "id": "orders_clean_no_unnecessary_change",
+      "split": "development",
+      "task_id": "orders-v1",
+      "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+      "source": "def summarize_orders(orders):\n    paid_count = 0\n    total_cents = 0\n    for order in orders:\n        if not isinstance(order, dict):\n            raise ValueError(\"订单必须是字典\")\n        if \"amount_cents\" not in order or \"paid\" not in order:\n            raise ValueError(\"订单缺少字段\")\n        amount = order[\"amount_cents\"]\n        paid = order[\"paid\"]\n        if type(amount) is not int or amount < 0 or type(paid) is not bool:\n            raise ValueError(\"订单字段非法\")\n        if paid:\n            paid_count += 1\n            total_cents += amount\n    return {\"paid_count\": paid_count, \"total_cents\": total_cents}\n",
+      "contract_hash": "d4eb3193b56cf1b57d0e69f07b10288a5d7f31345e7148054d67953e43176593",
+      "direct": {
+        "status": "completed",
+        "error_type": "",
+        "code": "def summarize_orders(orders):\n    paid_count = 0\n    total_cents = 0\n    for order in orders:\n        if not isinstance(order, dict):\n            raise ValueError(\"订单必须是字典\")\n        if \"amount_cents\" not in order or \"paid\" not in order:\n            raise ValueError(\"订单缺少字段\")\n        amount = order[\"amount_cents\"]\n        paid = order[\"paid\"]\n        if type(amount) is not int or amount < 0 or type(paid) is not bool:\n            raise ValueError(\"订单字段非法\")\n        if paid:\n            paid_count += 1\n            total_cents += amount\n    return {\"paid_count\": paid_count, \"total_cents\": total_cents}\n",
+        "elapsed_seconds": 1.28583,
+        "metrics": {
+          "model_calls": 1,
+          "http_attempts": 1,
+          "prompt_tokens": 663,
+          "completion_tokens": 255
+        },
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "empty",
+                "name": "empty",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 0, 'total_cents': 0}",
+                "expected": "{'paid_count': 0, 'total_cents': 0}",
+                "actual": {
+                  "paid_count": 0,
+                  "total_cents": 0
+                }
+              },
+              {
+                "id": "mixed",
+                "name": "mixed",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 1, 'total_cents': 120}",
+                "expected": "{'paid_count': 1, 'total_cents': 120}",
+                "actual": {
+                  "paid_count": 1,
+                  "total_cents": 120
+                }
+              },
+              {
+                "id": "zero",
+                "name": "zero",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 1, 'total_cents': 0}",
+                "expected": "{'paid_count': 1, 'total_cents': 0}",
+                "actual": {
+                  "paid_count": 1,
+                  "total_cents": 0
+                }
+              },
+              {
+                "id": "missing",
+                "name": "missing",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "negative",
+                "name": "negative",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "bool_amount",
+                "name": "bool_amount",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "bool_paid",
+                "name": "bool_paid",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "bad_order",
+                "name": "bad_order",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 8,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "acceptance_id": "orders-v1",
+            "elapsed_seconds": 0.4141
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "unpaid_validation",
+                "name": "unpaid_validation",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "multiple_paid",
+                "name": "multiple_paid",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 2, 'total_cents': 10}",
+                "expected": "{'paid_count': 2, 'total_cents': 10}",
+                "actual": {
+                  "paid_count": 2,
+                  "total_cents": 10
+                }
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "acceptance_id": "orders-v1",
+            "elapsed_seconds": 0.4327
+          }
+        }
+      },
+      "workflow": {
+        "run_id": "775108724baf44f1a1897b23dccc6932",
+        "status": "completed_verified",
+        "termination_reason": "frozen_acceptance_passed",
+        "code": "def summarize_orders(orders):\n    paid_count = 0\n    total_cents = 0\n    for order in orders:\n        if not isinstance(order, dict):\n            raise ValueError(\"订单必须是字典\")\n        if \"amount_cents\" not in order or \"paid\" not in order:\n            raise ValueError(\"订单缺少字段\")\n        amount = order[\"amount_cents\"]\n        paid = order[\"paid\"]\n        if type(amount) is not int or amount < 0 or type(paid) is not bool:\n            raise ValueError(\"订单字段非法\")\n        if paid:\n            paid_count += 1\n            total_cents += amount\n    return {\"paid_count\": paid_count, \"total_cents\": total_cents}\n",
+        "elapsed_seconds": 8.166746,
+        "metrics": {
+          "model_calls": 4,
+          "http_attempts": 4,
+          "prompt_tokens": 9984,
+          "completion_tokens": 916,
+          "tool_calls": 2,
+          "active_seconds": 8.095,
+          "scripted_actions": 0
+        },
+        "roles_executed": [
+          "acceptance_explainer",
+          "gate",
+          "inspect",
+          "review",
+          "validate"
+        ],
+        "versions": 1,
+        "fix_rounds": 0,
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "empty",
+                "name": "empty",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 0, 'total_cents': 0}",
+                "expected": "{'paid_count': 0, 'total_cents': 0}",
+                "actual": {
+                  "paid_count": 0,
+                  "total_cents": 0
+                }
+              },
+              {
+                "id": "mixed",
+                "name": "mixed",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 1, 'total_cents': 120}",
+                "expected": "{'paid_count': 1, 'total_cents': 120}",
+                "actual": {
+                  "paid_count": 1,
+                  "total_cents": 120
+                }
+              },
+              {
+                "id": "zero",
+                "name": "zero",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 1, 'total_cents': 0}",
+                "expected": "{'paid_count': 1, 'total_cents': 0}",
+                "actual": {
+                  "paid_count": 1,
+                  "total_cents": 0
+                }
+              },
+              {
+                "id": "missing",
+                "name": "missing",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "negative",
+                "name": "negative",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "bool_amount",
+                "name": "bool_amount",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "bool_paid",
+                "name": "bool_paid",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "bad_order",
+                "name": "bad_order",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 8,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "acceptance_id": "orders-v1",
+            "elapsed_seconds": 0.4717
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "unpaid_validation",
+                "name": "unpaid_validation",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "multiple_paid",
+                "name": "multiple_paid",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 2, 'total_cents': 10}",
+                "expected": "{'paid_count': 2, 'total_cents': 10}",
+                "actual": {
+                  "paid_count": 2,
+                  "total_cents": 10
+                }
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "acceptance_id": "orders-v1",
+            "elapsed_seconds": 0.4158
+          }
+        }
+      },
+      "initial": {
+        "code": "def summarize_orders(orders):\n    paid_count = 0\n    total_cents = 0\n    for order in orders:\n        if not isinstance(order, dict):\n            raise ValueError(\"订单必须是字典\")\n        if \"amount_cents\" not in order or \"paid\" not in order:\n            raise ValueError(\"订单缺少字段\")\n        amount = order[\"amount_cents\"]\n        paid = order[\"paid\"]\n        if type(amount) is not int or amount < 0 or type(paid) is not bool:\n            raise ValueError(\"订单字段非法\")\n        if paid:\n            paid_count += 1\n            total_cents += amount\n    return {\"paid_count\": paid_count, \"total_cents\": total_cents}\n",
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "empty",
+                "name": "empty",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 0, 'total_cents': 0}",
+                "expected": "{'paid_count': 0, 'total_cents': 0}",
+                "actual": {
+                  "paid_count": 0,
+                  "total_cents": 0
+                }
+              },
+              {
+                "id": "mixed",
+                "name": "mixed",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 1, 'total_cents': 120}",
+                "expected": "{'paid_count': 1, 'total_cents': 120}",
+                "actual": {
+                  "paid_count": 1,
+                  "total_cents": 120
+                }
+              },
+              {
+                "id": "zero",
+                "name": "zero",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 1, 'total_cents': 0}",
+                "expected": "{'paid_count': 1, 'total_cents': 0}",
+                "actual": {
+                  "paid_count": 1,
+                  "total_cents": 0
+                }
+              },
+              {
+                "id": "missing",
+                "name": "missing",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "negative",
+                "name": "negative",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "bool_amount",
+                "name": "bool_amount",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "bool_paid",
+                "name": "bool_paid",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "bad_order",
+                "name": "bad_order",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 8,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "acceptance_id": "orders-v1",
+            "elapsed_seconds": 0.4172
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "unpaid_validation",
+                "name": "unpaid_validation",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "multiple_paid",
+                "name": "multiple_paid",
+                "status": "passed",
+                "detail": "实际返回 {'paid_count': 2, 'total_cents': 10}",
+                "expected": "{'paid_count': 2, 'total_cents': 10}",
+                "actual": {
+                  "paid_count": 2,
+                  "total_cents": 10
+                }
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "acceptance_id": "orders-v1",
+            "elapsed_seconds": 0.4236
+          }
+        }
+      },
+      "execution_order": [
+        "workflow",
+        "direct"
+      ]
+    },
+    {
+      "id": "rotate_fresh_v1",
+      "split": "fresh",
+      "task_id": "rotate-fresh-v1",
+      "task": "实现 rotate_right(items, steps)，items 为 JSON 列表，steps 必须是整数且不接受 bool，否则抛 ValueError。返回向右循环移动 steps 位的新列表；负数等同向左移动；空列表返回空列表。任何输入不得被修改。仅用标准库，保留函数签名。",
+      "source": "def rotate_right(items, steps):\n    steps %= len(items)\n    items[:] = items[-steps:] + items[:-steps]\n    return items\n",
+      "direct": {
+        "status": "completed",
+        "error_type": "",
+        "code": "def rotate_right(items, steps):\n    if isinstance(steps, bool) or not isinstance(steps, int):\n        raise ValueError(\"steps must be an integer and not a bool\")\n    if not isinstance(items, list):\n        raise ValueError(\"items must be a list\")\n    n = len(items)\n    if n == 0:\n        return []\n    steps %= n\n    if steps == 0:\n        return list(items)\n    return list(items[-steps:]) + list(items[:-steps])\n",
+        "elapsed_seconds": 1.116738,
+        "metrics": {
+          "model_calls": 1,
+          "http_attempts": 1,
+          "prompt_tokens": 445,
+          "completion_tokens": 181
+        },
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "rotate_normal",
+                "name": "rotate_normal",
+                "status": "passed",
+                "detail": "实际返回 [3, 1, 2]",
+                "expected": "[3, 1, 2]",
+                "actual": [
+                  3,
+                  1,
+                  2
+                ]
+              },
+              {
+                "id": "rotate_empty",
+                "name": "rotate_empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "rotate_bool",
+                "name": "rotate_bool",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "89d4217ef4ccd34d9ab304669e565b860f7d07db647eac0a88dd99c9b31a49d7",
+            "acceptance_id": "rotate-fresh-v1",
+            "elapsed_seconds": 0.4003
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "rotate_negative",
+                "name": "rotate_negative",
+                "status": "passed",
+                "detail": "实际返回 [2, 3, 4, 1]",
+                "expected": "[2, 3, 4, 1]",
+                "actual": [
+                  2,
+                  3,
+                  4,
+                  1
+                ]
+              },
+              {
+                "id": "rotate_large",
+                "name": "rotate_large",
+                "status": "passed",
+                "detail": "实际返回 [3, 1, 2]",
+                "expected": "[3, 1, 2]",
+                "actual": [
+                  3,
+                  1,
+                  2
+                ]
+              },
+              {
+                "id": "rotate_zero",
+                "name": "rotate_zero",
+                "status": "passed",
+                "detail": "实际返回 [1, {'x': 2}]",
+                "expected": "[1, {'x': 2}]",
+                "actual": [
+                  1,
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              {
+                "id": "rotate_float",
+                "name": "rotate_float",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 4,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "89d4217ef4ccd34d9ab304669e565b860f7d07db647eac0a88dd99c9b31a49d7",
+            "acceptance_id": "rotate-fresh-v1",
+            "elapsed_seconds": 0.3713
+          }
+        }
+      },
+      "workflow": {
+        "run_id": "5ac1be9df91d4babb5dca2265c458ce6",
+        "status": "completed_verified",
+        "termination_reason": "frozen_acceptance_passed",
+        "code": "def rotate_right(items, steps):\n    if isinstance(steps, bool) or not isinstance(steps, int):\n        raise ValueError(\"steps must be an integer, not bool\")\n    if not items:\n        return []\n    steps %= len(items)\n    return items[-steps:] + items[:-steps]\n",
+        "elapsed_seconds": 26.932012,
+        "metrics": {
+          "model_calls": 11,
+          "http_attempts": 11,
+          "prompt_tokens": 28355,
+          "completion_tokens": 3736,
+          "tool_calls": 4,
+          "active_seconds": 26.828,
+          "scripted_actions": 0
+        },
+        "roles_executed": [
+          "acceptance_explainer",
+          "fix",
+          "gate",
+          "inspect",
+          "review",
+          "validate"
+        ],
+        "versions": 2,
+        "fix_rounds": 1,
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "rotate_normal",
+                "name": "rotate_normal",
+                "status": "passed",
+                "detail": "实际返回 [3, 1, 2]",
+                "expected": "[3, 1, 2]",
+                "actual": [
+                  3,
+                  1,
+                  2
+                ]
+              },
+              {
+                "id": "rotate_empty",
+                "name": "rotate_empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "rotate_bool",
+                "name": "rotate_bool",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "49ddb383b0f849b2e15b51483c20f5683f3b38df6d8136466e00717d73028227",
+            "acceptance_id": "rotate-fresh-v1",
+            "elapsed_seconds": 0.3889
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "rotate_negative",
+                "name": "rotate_negative",
+                "status": "passed",
+                "detail": "实际返回 [2, 3, 4, 1]",
+                "expected": "[2, 3, 4, 1]",
+                "actual": [
+                  2,
+                  3,
+                  4,
+                  1
+                ]
+              },
+              {
+                "id": "rotate_large",
+                "name": "rotate_large",
+                "status": "passed",
+                "detail": "实际返回 [3, 1, 2]",
+                "expected": "[3, 1, 2]",
+                "actual": [
+                  3,
+                  1,
+                  2
+                ]
+              },
+              {
+                "id": "rotate_zero",
+                "name": "rotate_zero",
+                "status": "passed",
+                "detail": "实际返回 [1, {'x': 2}]",
+                "expected": "[1, {'x': 2}]",
+                "actual": [
+                  1,
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              {
+                "id": "rotate_float",
+                "name": "rotate_float",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 4,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "49ddb383b0f849b2e15b51483c20f5683f3b38df6d8136466e00717d73028227",
+            "acceptance_id": "rotate-fresh-v1",
+            "elapsed_seconds": 0.3881
+          }
+        }
+      },
+      "initial": {
+        "code": "def rotate_right(items, steps):\n    steps %= len(items)\n    items[:] = items[-steps:] + items[:-steps]\n    return items\n",
+        "audits": {
+          "public": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "rotate_normal",
+                "name": "rotate_normal",
+                "status": "failed",
+                "detail": "实际返回 [3, 1, 2]；输入被修改",
+                "expected": "[3, 1, 2]",
+                "actual": [
+                  3,
+                  1,
+                  2
+                ]
+              },
+              {
+                "id": "rotate_empty",
+                "name": "rotate_empty",
+                "status": "failed",
+                "detail": "抛出 builtins.ZeroDivisionError",
+                "expected": "[]",
+                "actual": null
+              },
+              {
+                "id": "rotate_bool",
+                "name": "rotate_bool",
+                "status": "failed",
+                "detail": "实际返回 [1]",
+                "expected": "ValueError",
+                "actual": [
+                  1
+                ]
+              }
+            ],
+            "passed_count": 0,
+            "failed_count": 3,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "fbb93711a7272f510f28f8a1bce9cdbae4fae26b39705a3757d78cf7e53228ff",
+            "acceptance_id": "rotate-fresh-v1",
+            "elapsed_seconds": 0.3883
+          },
+          "holdout": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "rotate_negative",
+                "name": "rotate_negative",
+                "status": "failed",
+                "detail": "实际返回 [2, 3, 4, 1]；输入被修改",
+                "expected": "[2, 3, 4, 1]",
+                "actual": [
+                  2,
+                  3,
+                  4,
+                  1
+                ]
+              },
+              {
+                "id": "rotate_large",
+                "name": "rotate_large",
+                "status": "failed",
+                "detail": "实际返回 [3, 1, 2]；输入被修改",
+                "expected": "[3, 1, 2]",
+                "actual": [
+                  3,
+                  1,
+                  2
+                ]
+              },
+              {
+                "id": "rotate_zero",
+                "name": "rotate_zero",
+                "status": "passed",
+                "detail": "实际返回 [1, {'x': 2}]",
+                "expected": "[1, {'x': 2}]",
+                "actual": [
+                  1,
+                  {
+                    "x": 2
+                  }
+                ]
+              },
+              {
+                "id": "rotate_float",
+                "name": "rotate_float",
+                "status": "failed",
+                "detail": "抛出 builtins.ZeroDivisionError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 1,
+            "failed_count": 3,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "fbb93711a7272f510f28f8a1bce9cdbae4fae26b39705a3757d78cf7e53228ff",
+            "acceptance_id": "rotate-fresh-v1",
+            "elapsed_seconds": 0.3828
+          }
+        }
+      },
+      "execution_order": [
+        "direct",
+        "workflow"
+      ]
+    },
+    {
+      "id": "chunks_fresh_v1",
+      "split": "fresh",
+      "task_id": "chunks-fresh-v1",
+      "task": "实现 chunk_list(items, size)，将 JSON 列表按 size 长度从左到右分块，最后不足 size 的块也保留。空列表返回 []。size 必须为正整数且不接受 bool；任何非法 size（即使 items 为空）抛 ValueError。不得修改输入。仅用标准库，保留函数签名。",
+      "source": "def chunk_list(items, size):\n    return [items[i:i+size] for i in range(0, len(items)-size+1, size)]\n",
+      "direct": {
+        "status": "completed",
+        "error_type": "",
+        "code": "def chunk_list(items, size):\n    if isinstance(size, bool) or not isinstance(size, int) or size <= 0:\n        raise ValueError(\"size must be a positive integer\")\n    return [items[i:i + size] for i in range(0, len(items), size)]\n",
+        "elapsed_seconds": 1.130422,
+        "metrics": {
+          "model_calls": 1,
+          "http_attempts": 1,
+          "prompt_tokens": 461,
+          "completion_tokens": 118
+        },
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "chunks_tail",
+                "name": "chunks_tail",
+                "status": "passed",
+                "detail": "实际返回 [[1, 2], [3]]",
+                "expected": "[[1, 2], [3]]",
+                "actual": [
+                  [
+                    1,
+                    2
+                  ],
+                  [
+                    3
+                  ]
+                ]
+              },
+              {
+                "id": "chunks_empty",
+                "name": "chunks_empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "chunks_zero",
+                "name": "chunks_zero",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "f4cd88417ee9f5d71dac8705366d028ecd69a8ddeb38c64510d96abbf4edb939",
+            "acceptance_id": "chunks-fresh-v1",
+            "elapsed_seconds": 1.178
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "chunks_bool",
+                "name": "chunks_bool",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "chunks_float",
+                "name": "chunks_float",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "chunks_long",
+                "name": "chunks_long",
+                "status": "passed",
+                "detail": "实际返回 [[1, 2]]",
+                "expected": "[[1, 2]]",
+                "actual": [
+                  [
+                    1,
+                    2
+                  ]
+                ]
+              },
+              {
+                "id": "chunks_negative",
+                "name": "chunks_negative",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "chunks_nested",
+                "name": "chunks_nested",
+                "status": "passed",
+                "detail": "实际返回 [[{'x': 1}], [[2]]]",
+                "expected": "[[{'x': 1}], [[2]]]",
+                "actual": [
+                  [
+                    {
+                      "x": 1
+                    }
+                  ],
+                  [
+                    [
+                      2
+                    ]
+                  ]
+                ]
+              }
+            ],
+            "passed_count": 5,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "f4cd88417ee9f5d71dac8705366d028ecd69a8ddeb38c64510d96abbf4edb939",
+            "acceptance_id": "chunks-fresh-v1",
+            "elapsed_seconds": 1.1511
+          }
+        }
+      },
+      "workflow": {
+        "run_id": "4106d367520a4f688fadc73a55e08c4c",
+        "status": "completed_verified",
+        "termination_reason": "frozen_acceptance_passed",
+        "code": "def chunk_list(items, size):\n    if isinstance(size, bool) or not isinstance(size, int) or size <= 0:\n        raise ValueError(\"size must be a positive integer\")\n    return [items[i:i+size] for i in range(0, len(items), size)]\n",
+        "elapsed_seconds": 22.57475,
+        "metrics": {
+          "model_calls": 10,
+          "http_attempts": 10,
+          "prompt_tokens": 24586,
+          "completion_tokens": 2699,
+          "tool_calls": 4,
+          "active_seconds": 22.438,
+          "scripted_actions": 0
+        },
+        "roles_executed": [
+          "acceptance_explainer",
+          "fix",
+          "gate",
+          "inspect",
+          "review",
+          "validate"
+        ],
+        "versions": 2,
+        "fix_rounds": 1,
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "chunks_tail",
+                "name": "chunks_tail",
+                "status": "passed",
+                "detail": "实际返回 [[1, 2], [3]]",
+                "expected": "[[1, 2], [3]]",
+                "actual": [
+                  [
+                    1,
+                    2
+                  ],
+                  [
+                    3
+                  ]
+                ]
+              },
+              {
+                "id": "chunks_empty",
+                "name": "chunks_empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "chunks_zero",
+                "name": "chunks_zero",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "87bedf40870bcd7cbccb0790e745d60b2c62ad5cbf384e76402532704cd39f3b",
+            "acceptance_id": "chunks-fresh-v1",
+            "elapsed_seconds": 1.1914
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "chunks_bool",
+                "name": "chunks_bool",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "chunks_float",
+                "name": "chunks_float",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "chunks_long",
+                "name": "chunks_long",
+                "status": "passed",
+                "detail": "实际返回 [[1, 2]]",
+                "expected": "[[1, 2]]",
+                "actual": [
+                  [
+                    1,
+                    2
+                  ]
+                ]
+              },
+              {
+                "id": "chunks_negative",
+                "name": "chunks_negative",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "chunks_nested",
+                "name": "chunks_nested",
+                "status": "passed",
+                "detail": "实际返回 [[{'x': 1}], [[2]]]",
+                "expected": "[[{'x': 1}], [[2]]]",
+                "actual": [
+                  [
+                    {
+                      "x": 1
+                    }
+                  ],
+                  [
+                    [
+                      2
+                    ]
+                  ]
+                ]
+              }
+            ],
+            "passed_count": 5,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "87bedf40870bcd7cbccb0790e745d60b2c62ad5cbf384e76402532704cd39f3b",
+            "acceptance_id": "chunks-fresh-v1",
+            "elapsed_seconds": 1.2402
+          }
+        }
+      },
+      "initial": {
+        "code": "def chunk_list(items, size):\n    return [items[i:i+size] for i in range(0, len(items)-size+1, size)]\n",
+        "audits": {
+          "public": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "chunks_tail",
+                "name": "chunks_tail",
+                "status": "failed",
+                "detail": "实际返回 [[1, 2]]",
+                "expected": "[[1, 2], [3]]",
+                "actual": [
+                  [
+                    1,
+                    2
+                  ]
+                ]
+              },
+              {
+                "id": "chunks_empty",
+                "name": "chunks_empty",
+                "status": "passed",
+                "detail": "实际返回 []",
+                "expected": "[]",
+                "actual": []
+              },
+              {
+                "id": "chunks_zero",
+                "name": "chunks_zero",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 1,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "454beba540a35fddcf570b1f4d32de7258b4ef47665336928e925a6860e7eb3e",
+            "acceptance_id": "chunks-fresh-v1",
+            "elapsed_seconds": 1.1643
+          },
+          "holdout": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "chunks_bool",
+                "name": "chunks_bool",
+                "status": "failed",
+                "detail": "实际返回 []",
+                "expected": "ValueError",
+                "actual": []
+              },
+              {
+                "id": "chunks_float",
+                "name": "chunks_float",
+                "status": "failed",
+                "detail": "抛出 builtins.TypeError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "chunks_long",
+                "name": "chunks_long",
+                "status": "failed",
+                "detail": "实际返回 []",
+                "expected": "[[1, 2]]",
+                "actual": []
+              },
+              {
+                "id": "chunks_negative",
+                "name": "chunks_negative",
+                "status": "failed",
+                "detail": "实际返回 []",
+                "expected": "ValueError",
+                "actual": []
+              },
+              {
+                "id": "chunks_nested",
+                "name": "chunks_nested",
+                "status": "passed",
+                "detail": "实际返回 [[{'x': 1}], [[2]]]",
+                "expected": "[[{'x': 1}], [[2]]]",
+                "actual": [
+                  [
+                    {
+                      "x": 1
+                    }
+                  ],
+                  [
+                    [
+                      2
+                    ]
+                  ]
+                ]
+              }
+            ],
+            "passed_count": 1,
+            "failed_count": 4,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "454beba540a35fddcf570b1f4d32de7258b4ef47665336928e925a6860e7eb3e",
+            "acceptance_id": "chunks-fresh-v1",
+            "elapsed_seconds": 1.1369
+          }
+        }
+      },
+      "execution_order": [
+        "workflow",
+        "direct"
+      ]
+    },
+    {
+      "id": "decode_fresh_v1",
+      "split": "fresh",
+      "task_id": "decode-fresh-v1",
+      "task": "实现 decode_runs(runs)：runs 为二元素列表组成的列表，每项 [text,count]。text 必须是长度恰好为1的字符串，count 必须是非负整数且不接受 bool。按顺序重复字符并拼成字符串，0次可用，空 runs 返回空字符串。任何非法项（形状、类型或数值）均抛 ValueError；不得修改输入。只用标准库，保留函数签名。",
+      "source": "def decode_runs(runs):\n    return \"\".join(text * count for text, count in runs)\n",
+      "direct": {
+        "status": "completed",
+        "error_type": "",
+        "code": "def decode_runs(runs):\n    if not isinstance(runs, list):\n        raise ValueError(\"runs must be a list\")\n    parts = []\n    for item in runs:\n        if not isinstance(item, list) or len(item) != 2:\n            raise ValueError(\"each run must be a two-element list\")\n        text, count = item\n        if not isinstance(text, str) or len(text) != 1:\n            raise ValueError(\"text must be a single-character string\")\n        if isinstance(count, bool) or not isinstance(count, int) or count < 0:\n            raise ValueError(\"count must be a non-negative integer\")\n        parts.append(text * count)\n    return \"\".join(parts)\n",
+        "elapsed_seconds": 1.260959,
+        "metrics": {
+          "model_calls": 1,
+          "http_attempts": 1,
+          "prompt_tokens": 490,
+          "completion_tokens": 233
+        },
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "decode_normal",
+                "name": "decode_normal",
+                "status": "passed",
+                "detail": "实际返回 'aab'",
+                "expected": "'aab'",
+                "actual": "aab"
+              },
+              {
+                "id": "decode_empty",
+                "name": "decode_empty",
+                "status": "passed",
+                "detail": "实际返回 ''",
+                "expected": "''",
+                "actual": ""
+              },
+              {
+                "id": "decode_negative",
+                "name": "decode_negative",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "aa9f66f496ac8b2368af981ff2cedf2538b149c785ec8f08dbd72bbcfcc526ad",
+            "acceptance_id": "decode-fresh-v1",
+            "elapsed_seconds": 1.1852
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "decode_bool",
+                "name": "decode_bool",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "decode_long",
+                "name": "decode_long",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "decode_shape",
+                "name": "decode_shape",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "decode_unicode",
+                "name": "decode_unicode",
+                "status": "passed",
+                "detail": "实际返回 '中中文'",
+                "expected": "'中中文'",
+                "actual": "中中文"
+              },
+              {
+                "id": "decode_type",
+                "name": "decode_type",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 5,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "aa9f66f496ac8b2368af981ff2cedf2538b149c785ec8f08dbd72bbcfcc526ad",
+            "acceptance_id": "decode-fresh-v1",
+            "elapsed_seconds": 1.054
+          }
+        }
+      },
+      "workflow": {
+        "run_id": "5bf7a5cfaf50465c9e12be2ec414d8ff",
+        "status": "completed_verified",
+        "termination_reason": "frozen_acceptance_passed",
+        "code": "def decode_runs(runs):\n    if not isinstance(runs, (list, tuple)):\n        raise ValueError(\"runs must be a list of [text, count] items\")\n    parts = []\n    for item in runs:\n        if not isinstance(item, (list, tuple)) or len(item) != 2:\n            raise ValueError(\"each run must be a two-element [text, count] item\")\n        text, count = item\n        if not isinstance(text, str) or len(text) != 1:\n            raise ValueError(\"text must be a single-character string\")\n        if type(count) is not int or count < 0:\n            raise ValueError(\"count must be a non-negative integer\")\n        parts.append(text * count)\n    return \"\".join(parts)\n",
+        "elapsed_seconds": 29.702242,
+        "metrics": {
+          "model_calls": 10,
+          "http_attempts": 10,
+          "prompt_tokens": 27036,
+          "completion_tokens": 3566,
+          "tool_calls": 4,
+          "active_seconds": 29.439,
+          "scripted_actions": 0
+        },
+        "roles_executed": [
+          "acceptance_explainer",
+          "fix",
+          "gate",
+          "inspect",
+          "review",
+          "validate"
+        ],
+        "versions": 2,
+        "fix_rounds": 1,
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "decode_normal",
+                "name": "decode_normal",
+                "status": "passed",
+                "detail": "实际返回 'aab'",
+                "expected": "'aab'",
+                "actual": "aab"
+              },
+              {
+                "id": "decode_empty",
+                "name": "decode_empty",
+                "status": "passed",
+                "detail": "实际返回 ''",
+                "expected": "''",
+                "actual": ""
+              },
+              {
+                "id": "decode_negative",
+                "name": "decode_negative",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "32a01408b795a9619db547918c4b9ede08e59e8b3b615ce8849fe3063ab36bf7",
+            "acceptance_id": "decode-fresh-v1",
+            "elapsed_seconds": 1.144
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "decode_bool",
+                "name": "decode_bool",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "decode_long",
+                "name": "decode_long",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "decode_shape",
+                "name": "decode_shape",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "decode_unicode",
+                "name": "decode_unicode",
+                "status": "passed",
+                "detail": "实际返回 '中中文'",
+                "expected": "'中中文'",
+                "actual": "中中文"
+              },
+              {
+                "id": "decode_type",
+                "name": "decode_type",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 5,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "32a01408b795a9619db547918c4b9ede08e59e8b3b615ce8849fe3063ab36bf7",
+            "acceptance_id": "decode-fresh-v1",
+            "elapsed_seconds": 1.2225
+          }
+        }
+      },
+      "initial": {
+        "code": "def decode_runs(runs):\n    return \"\".join(text * count for text, count in runs)\n",
+        "audits": {
+          "public": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "decode_normal",
+                "name": "decode_normal",
+                "status": "passed",
+                "detail": "实际返回 'aab'",
+                "expected": "'aab'",
+                "actual": "aab"
+              },
+              {
+                "id": "decode_empty",
+                "name": "decode_empty",
+                "status": "passed",
+                "detail": "实际返回 ''",
+                "expected": "''",
+                "actual": ""
+              },
+              {
+                "id": "decode_negative",
+                "name": "decode_negative",
+                "status": "failed",
+                "detail": "实际返回 ''",
+                "expected": "ValueError",
+                "actual": ""
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 1,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "68e0ec6e74d85dabb63c53106e7212afbb9f5c28df937c6683b2c988f67829a7",
+            "acceptance_id": "decode-fresh-v1",
+            "elapsed_seconds": 1.1399
+          },
+          "holdout": {
+            "status": "failed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "decode_bool",
+                "name": "decode_bool",
+                "status": "failed",
+                "detail": "实际返回 'a'",
+                "expected": "ValueError",
+                "actual": "a"
+              },
+              {
+                "id": "decode_long",
+                "name": "decode_long",
+                "status": "failed",
+                "detail": "实际返回 'abab'",
+                "expected": "ValueError",
+                "actual": "abab"
+              },
+              {
+                "id": "decode_shape",
+                "name": "decode_shape",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              },
+              {
+                "id": "decode_unicode",
+                "name": "decode_unicode",
+                "status": "passed",
+                "detail": "实际返回 '中中文'",
+                "expected": "'中中文'",
+                "actual": "中中文"
+              },
+              {
+                "id": "decode_type",
+                "name": "decode_type",
+                "status": "failed",
+                "detail": "抛出 builtins.TypeError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 2,
+            "failed_count": 3,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "68e0ec6e74d85dabb63c53106e7212afbb9f5c28df937c6683b2c988f67829a7",
+            "acceptance_id": "decode-fresh-v1",
+            "elapsed_seconds": 1.2631
+          }
+        }
+      },
+      "execution_order": [
+        "direct",
+        "workflow"
+      ]
+    },
+    {
+      "id": "overlap_fresh_v1",
+      "split": "fresh",
+      "task_id": "overlap-fresh-v1",
+      "task": "实现 count_overlaps(text, needle)：两个参数均为字符串，返回 needle 在 text 中出现次数，允许相邻匹配重叠，大小写敏感，按 Python 字符串字符处理。needle 为空字符串抛 ValueError。不得修改输入，仅用标准库，保留函数签名。",
+      "source": null,
+      "direct": {
+        "status": "completed",
+        "error_type": "",
+        "code": "def count_overlaps(text, needle):\n    \"\"\"Return the number of (possibly overlapping) occurrences of needle in text.\n\n    Matching is case-sensitive and operates on Python string characters.\n    An empty needle raises ValueError.\n    \"\"\"\n    if not isinstance(text, str) or not isinstance(needle, str):\n        raise TypeError(\"text and needle must be strings\")\n    if needle == \"\":\n        raise ValueError(\"needle must not be empty\")\n\n    count = 0\n    start = 0\n    while True:\n        index = text.find(needle, start)\n        if index == -1:\n            break\n        count += 1\n        start = index + 1\n    return count\n",
+        "elapsed_seconds": 1.157626,
+        "metrics": {
+          "model_calls": 1,
+          "http_attempts": 1,
+          "prompt_tokens": 410,
+          "completion_tokens": 227
+        },
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "overlap_normal",
+                "name": "overlap_normal",
+                "status": "passed",
+                "detail": "实际返回 3",
+                "expected": "3",
+                "actual": 3
+              },
+              {
+                "id": "overlap_empty",
+                "name": "overlap_empty",
+                "status": "passed",
+                "detail": "实际返回 0",
+                "expected": "0",
+                "actual": 0
+              },
+              {
+                "id": "overlap_invalid",
+                "name": "overlap_invalid",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "639baf645c181ac35df34fc69d73fdc649816c8b648790b18e42421b5001bd68",
+            "acceptance_id": "overlap-fresh-v1",
+            "elapsed_seconds": 0.3995
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "overlap_unicode",
+                "name": "overlap_unicode",
+                "status": "passed",
+                "detail": "实际返回 2",
+                "expected": "2",
+                "actual": 2
+              },
+              {
+                "id": "overlap_mixed",
+                "name": "overlap_mixed",
+                "status": "passed",
+                "detail": "实际返回 2",
+                "expected": "2",
+                "actual": 2
+              },
+              {
+                "id": "overlap_long",
+                "name": "overlap_long",
+                "status": "passed",
+                "detail": "实际返回 0",
+                "expected": "0",
+                "actual": 0
+              },
+              {
+                "id": "overlap_last",
+                "name": "overlap_last",
+                "status": "passed",
+                "detail": "实际返回 2",
+                "expected": "2",
+                "actual": 2
+              }
+            ],
+            "passed_count": 4,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "639baf645c181ac35df34fc69d73fdc649816c8b648790b18e42421b5001bd68",
+            "acceptance_id": "overlap-fresh-v1",
+            "elapsed_seconds": 0.4138
+          }
+        }
+      },
+      "workflow": {
+        "run_id": "8beeb158ee1c49b09a0c28c3631782ca",
+        "status": "completed_verified",
+        "termination_reason": "frozen_acceptance_passed",
+        "code": "def count_overlaps(text, needle):\n    \"\"\"Return the number of occurrences of needle in text, allowing overlaps.\n\n    Matching is case-sensitive and operates on Python string characters.\n    An empty needle raises ValueError.\n    \"\"\"\n    if not isinstance(text, str) or not isinstance(needle, str):\n        raise TypeError(\"text and needle must be strings\")\n    if needle == \"\":\n        raise ValueError(\"needle must not be empty\")\n\n    count = 0\n    start = 0\n    while True:\n        index = text.find(needle, start)\n        if index == -1:\n            break\n        count += 1\n        start = index + 1\n    return count\n",
+        "elapsed_seconds": 12.107071,
+        "metrics": {
+          "model_calls": 5,
+          "http_attempts": 5,
+          "prompt_tokens": 9780,
+          "completion_tokens": 1197,
+          "tool_calls": 2,
+          "active_seconds": 11.985,
+          "scripted_actions": 0
+        },
+        "roles_executed": [
+          "acceptance_explainer",
+          "coding",
+          "gate",
+          "inspect",
+          "review",
+          "validate"
+        ],
+        "versions": 1,
+        "fix_rounds": 0,
+        "audits": {
+          "public": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "overlap_normal",
+                "name": "overlap_normal",
+                "status": "passed",
+                "detail": "实际返回 3",
+                "expected": "3",
+                "actual": 3
+              },
+              {
+                "id": "overlap_empty",
+                "name": "overlap_empty",
+                "status": "passed",
+                "detail": "实际返回 0",
+                "expected": "0",
+                "actual": 0
+              },
+              {
+                "id": "overlap_invalid",
+                "name": "overlap_invalid",
+                "status": "passed",
+                "detail": "抛出 builtins.ValueError",
+                "expected": "ValueError",
+                "actual": null
+              }
+            ],
+            "passed_count": 3,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": false,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "470b3a8715d80541184f13013932a7ef9b5a97ad7c952484210e7a202dc5930b",
+            "acceptance_id": "overlap-fresh-v1",
+            "elapsed_seconds": 0.3967
+          },
+          "holdout": {
+            "status": "passed",
+            "executed": true,
+            "checks": [
+              {
+                "id": "overlap_unicode",
+                "name": "overlap_unicode",
+                "status": "passed",
+                "detail": "实际返回 2",
+                "expected": "2",
+                "actual": 2
+              },
+              {
+                "id": "overlap_mixed",
+                "name": "overlap_mixed",
+                "status": "passed",
+                "detail": "实际返回 2",
+                "expected": "2",
+                "actual": 2
+              },
+              {
+                "id": "overlap_long",
+                "name": "overlap_long",
+                "status": "passed",
+                "detail": "实际返回 0",
+                "expected": "0",
+                "actual": 0
+              },
+              {
+                "id": "overlap_last",
+                "name": "overlap_last",
+                "status": "passed",
+                "detail": "实际返回 2",
+                "expected": "2",
+                "actual": 2
+              }
+            ],
+            "passed_count": 4,
+            "failed_count": 0,
+            "error": "",
+            "backend": "cpython-wasi",
+            "holdout": true,
+            "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+            "code_hash": "470b3a8715d80541184f13013932a7ef9b5a97ad7c952484210e7a202dc5930b",
+            "acceptance_id": "overlap-fresh-v1",
+            "elapsed_seconds": 0.3805
+          }
+        }
+      },
+      "initial": {
+        "code": null,
+        "audits": {}
+      },
+      "execution_order": [
+        "workflow",
+        "direct"
+      ]
+    }
+  ],
+  "summary": {
+    "all": {
+      "direct": {
+        "planned": 8,
+        "passed": 8,
+        "failed": 0,
+        "unavailable": 0,
+        "pass_rate": 1.0,
+        "regressions": 0,
+        "regressed_checks": 0,
+        "seconds": 9.7646,
+        "tokens": 5227,
+        "calls": 8
+      },
+      "workflow": {
+        "planned": 8,
+        "passed": 8,
+        "failed": 0,
+        "unavailable": 0,
+        "pass_rate": 1.0,
+        "regressions": 0,
+        "regressed_checks": 0,
+        "seconds": 165.7076,
+        "tokens": 193029,
+        "calls": 70
+      },
+      "workflow_only_passes": 0,
+      "direct_only_passes": 0
+    },
+    "development": {
+      "direct": {
+        "planned": 4,
+        "passed": 4,
+        "failed": 0,
+        "unavailable": 0,
+        "pass_rate": 1.0,
+        "regressions": 0,
+        "regressed_checks": 0,
+        "seconds": 5.0989,
+        "tokens": 2662,
+        "calls": 4
+      },
+      "workflow": {
+        "planned": 4,
+        "passed": 4,
+        "failed": 0,
+        "unavailable": 0,
+        "pass_rate": 1.0,
+        "regressions": 0,
+        "regressed_checks": 0,
+        "seconds": 74.3915,
+        "tokens": 92074,
+        "calls": 34
+      },
+      "workflow_only_passes": 0,
+      "direct_only_passes": 0
+    },
+    "fresh": {
+      "direct": {
+        "planned": 4,
+        "passed": 4,
+        "failed": 0,
+        "unavailable": 0,
+        "pass_rate": 1.0,
+        "regressions": 0,
+        "regressed_checks": 0,
+        "seconds": 4.6657,
+        "tokens": 2565,
+        "calls": 4
+      },
+      "workflow": {
+        "planned": 4,
+        "passed": 4,
+        "failed": 0,
+        "unavailable": 0,
+        "pass_rate": 1.0,
+        "regressions": 0,
+        "regressed_checks": 0,
+        "seconds": 91.3161,
+        "tokens": 100955,
+        "calls": 36
+      },
+      "workflow_only_passes": 0,
+      "direct_only_passes": 0
+    }
+  },
+  "budget_usage": {
+    "calls": 78,
+    "actual_tokens": 198256,
+    "charged_tokens": 198256
+  },
+  "completed_at": "2026-10-17T02:34:44.849846+00:00"
+}

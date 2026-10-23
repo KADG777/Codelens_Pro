@@ -1,0 +1,15 @@
+[
+  {
+    "id": "pipeline_rename_and_followup",
+    "filename": "pipeline.py",
+    "code": "def process(raw):\n    prepared = raw + 1\n    prediction = prepared * 2\n    preview = prepared\n    return prediction, preview\n",
+    "questions": [
+      "修改代码，去掉 raw 加 1 的偏移，并将 prepared 改名为 normalized。保持函数签名和返回结构；推理计算和预览均使用去掉偏移后的输入。",
+      "我还没有应用你刚才的补丁。请解释原代码与建议方案中的预览和推理分别使用什么数据，不要再给代码。"
+    ],
+    "expected": [
+      "修改定义时同步所有引用，不引入未定义名称；保持 process(raw) 与二元返回结构。",
+      "区分原快照与未应用的建议；说明预览是计算输入，prediction 是其乘 2 的结果；不声称已执行。"
+    ]
+  }
+]

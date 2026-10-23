@@ -1,0 +1,550 @@
+{
+  "schema_version": 1,
+  "suite_id": "paired-20261017-v1",
+  "frozen_at": "2026-10-17T02:29:34.165277+00:00",
+  "description": "4 previously developed tasks + 4 fresh synthetic contracts, authored after workflow changes and frozen before model runs. Not an external blind benchmark. One run per arm; no post-result tuning.",
+  "fresh_specs": [
+    {
+      "id": "rotate-fresh-v1",
+      "label": "新任务：循环右移",
+      "entrypoint": "rotate_right",
+      "parameters": [
+        "items",
+        "steps"
+      ],
+      "task": "实现 rotate_right(items, steps)，items 为 JSON 列表，steps 必须是整数且不接受 bool，否则抛 ValueError。返回向右循环移动 steps 位的新列表；负数等同向左移动；空列表返回空列表。任何输入不得被修改。仅用标准库，保留函数签名。",
+      "source": "def rotate_right(items, steps):\n    steps %= len(items)\n    items[:] = items[-steps:] + items[:-steps]\n    return items\n",
+      "public_cases": [
+        {
+          "id": "rotate_normal",
+          "args": [
+            [
+              1,
+              2,
+              3
+            ],
+            1
+          ],
+          "expected": [
+            3,
+            1,
+            2
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "rotate_empty",
+          "args": [
+            [],
+            2
+          ],
+          "expected": [],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "rotate_bool",
+          "args": [
+            [
+              1
+            ],
+            true
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "rotate_negative",
+          "args": [
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            -1
+          ],
+          "expected": [
+            2,
+            3,
+            4,
+            1
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "rotate_large",
+          "args": [
+            [
+              1,
+              2,
+              3
+            ],
+            100
+          ],
+          "expected": [
+            3,
+            1,
+            2
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "rotate_zero",
+          "args": [
+            [
+              1,
+              {
+                "x": 2
+              }
+            ],
+            0
+          ],
+          "expected": [
+            1,
+            {
+              "x": 2
+            }
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "rotate_float",
+          "args": [
+            [],
+            1.0
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ]
+    },
+    {
+      "id": "chunks-fresh-v1",
+      "label": "新任务：保留尾块",
+      "entrypoint": "chunk_list",
+      "parameters": [
+        "items",
+        "size"
+      ],
+      "task": "实现 chunk_list(items, size)，将 JSON 列表按 size 长度从左到右分块，最后不足 size 的块也保留。空列表返回 []。size 必须为正整数且不接受 bool；任何非法 size（即使 items 为空）抛 ValueError。不得修改输入。仅用标准库，保留函数签名。",
+      "source": "def chunk_list(items, size):\n    return [items[i:i+size] for i in range(0, len(items)-size+1, size)]\n",
+      "public_cases": [
+        {
+          "id": "chunks_tail",
+          "args": [
+            [
+              1,
+              2,
+              3
+            ],
+            2
+          ],
+          "expected": [
+            [
+              1,
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "chunks_empty",
+          "args": [
+            [],
+            2
+          ],
+          "expected": [],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "chunks_zero",
+          "args": [
+            [
+              1
+            ],
+            0
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "chunks_bool",
+          "args": [
+            [],
+            true
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "chunks_float",
+          "args": [
+            [
+              1,
+              2
+            ],
+            2.0
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "chunks_long",
+          "args": [
+            [
+              1,
+              2
+            ],
+            5
+          ],
+          "expected": [
+            [
+              1,
+              2
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "chunks_negative",
+          "args": [
+            [],
+            -1
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "chunks_nested",
+          "args": [
+            [
+              {
+                "x": 1
+              },
+              [
+                2
+              ]
+            ],
+            1
+          ],
+          "expected": [
+            [
+              {
+                "x": 1
+              }
+            ],
+            [
+              [
+                2
+              ]
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        }
+      ]
+    },
+    {
+      "id": "decode-fresh-v1",
+      "label": "新任务：游程解码",
+      "entrypoint": "decode_runs",
+      "parameters": [
+        "runs"
+      ],
+      "task": "实现 decode_runs(runs)：runs 为二元素列表组成的列表，每项 [text,count]。text 必须是长度恰好为1的字符串，count 必须是非负整数且不接受 bool。按顺序重复字符并拼成字符串，0次可用，空 runs 返回空字符串。任何非法项（形状、类型或数值）均抛 ValueError；不得修改输入。只用标准库，保留函数签名。",
+      "source": "def decode_runs(runs):\n    return \"\".join(text * count for text, count in runs)\n",
+      "public_cases": [
+        {
+          "id": "decode_normal",
+          "args": [
+            [
+              [
+                "a",
+                2
+              ],
+              [
+                "b",
+                1
+              ]
+            ]
+          ],
+          "expected": "aab",
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "decode_empty",
+          "args": [
+            []
+          ],
+          "expected": "",
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "decode_negative",
+          "args": [
+            [
+              [
+                "a",
+                -1
+              ]
+            ]
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "decode_bool",
+          "args": [
+            [
+              [
+                "a",
+                true
+              ]
+            ]
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "decode_long",
+          "args": [
+            [
+              [
+                "ab",
+                2
+              ]
+            ]
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "decode_shape",
+          "args": [
+            [
+              [
+                "a",
+                2,
+                3
+              ]
+            ]
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "decode_unicode",
+          "args": [
+            [
+              [
+                "中",
+                2
+              ],
+              [
+                "!",
+                0
+              ],
+              [
+                "文",
+                1
+              ]
+            ]
+          ],
+          "expected": "中中文",
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "decode_type",
+          "args": [
+            [
+              [
+                8,
+                2
+              ]
+            ]
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ]
+    },
+    {
+      "id": "overlap-fresh-v1",
+      "label": "新任务：重叠子串计数",
+      "entrypoint": "count_overlaps",
+      "parameters": [
+        "text",
+        "needle"
+      ],
+      "task": "实现 count_overlaps(text, needle)：两个参数均为字符串，返回 needle 在 text 中出现次数，允许相邻匹配重叠，大小写敏感，按 Python 字符串字符处理。needle 为空字符串抛 ValueError。不得修改输入，仅用标准库，保留函数签名。",
+      "source": null,
+      "public_cases": [
+        {
+          "id": "overlap_normal",
+          "args": [
+            "aaaa",
+            "aa"
+          ],
+          "expected": 3,
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "overlap_empty",
+          "args": [
+            "",
+            "a"
+          ],
+          "expected": 0,
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "overlap_invalid",
+          "args": [
+            "abc",
+            ""
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "overlap_unicode",
+          "args": [
+            "中中中",
+            "中中"
+          ],
+          "expected": 2,
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "overlap_mixed",
+          "args": [
+            "AbAbAb",
+            "AbAb"
+          ],
+          "expected": 2,
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "overlap_long",
+          "args": [
+            "ab",
+            "abc"
+          ],
+          "expected": 0,
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "overlap_last",
+          "args": [
+            "ababa",
+            "aba"
+          ],
+          "expected": 2,
+          "raises": null,
+          "preserve_input": true
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "clamp_bounds_and_exception",
+      "split": "development",
+      "task_id": "clamp-v1",
+      "task": "实现 clamp(value, lower, upper)：整数上下限内返回 value，越界返回对应边界；lower>upper 时抛 ValueError。",
+      "source": "def clamp(value, lower, upper):\n    return min(lower, max(value, upper))\n",
+      "contract_hash": "d91c2212573347e689f2043534de4508560786968b4d96e0f85433896b476727"
+    },
+    {
+      "id": "merge_intervals_without_mutation",
+      "split": "development",
+      "task_id": "merge-intervals-v1",
+      "task": "实现 merge_intervals(intervals)：输入整数闭区间的二元列表，按起点排序合并重叠或端点相同的区间；start>end 抛 ValueError；不修改输入。空输入返回空列表。",
+      "source": "def merge_intervals(intervals):\n    intervals.sort()\n    result = []\n    for start, end in intervals:\n        if result and start < result[-1][1]:\n            result[-1][1] = end\n        else:\n            result.append([start, end])\n    return result\n",
+      "contract_hash": "0d00ddd4f6b45183fdcf47e9f0bce8af922c082edce61597e01514496d4be6b2"
+    },
+    {
+      "id": "moving_average_last_window_and_bool",
+      "split": "development",
+      "task_id": "moving-average-v1",
+      "task": "实现 moving_average(values, window)：有限数值列表，返回每个完整窗口的均值列表；window 必须为正整数且 bool 不算整数，否则抛 ValueError；长度不足返回空列表，不修改输入。",
+      "source": "def moving_average(values, window):\n    if window <= 0:\n        raise ValueError('invalid window')\n    return [sum(values[i:i + window]) / window for i in range(len(values) - window)]\n",
+      "contract_hash": "a91d8c6bf016053a01c9cdb08d39e6ee84b6de0352399ab732a03ff0e009d603"
+    },
+    {
+      "id": "orders_clean_no_unnecessary_change",
+      "split": "development",
+      "task_id": "orders-v1",
+      "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+      "source": "def summarize_orders(orders):\n    paid_count = 0\n    total_cents = 0\n    for order in orders:\n        if not isinstance(order, dict):\n            raise ValueError(\"订单必须是字典\")\n        if \"amount_cents\" not in order or \"paid\" not in order:\n            raise ValueError(\"订单缺少字段\")\n        amount = order[\"amount_cents\"]\n        paid = order[\"paid\"]\n        if type(amount) is not int or amount < 0 or type(paid) is not bool:\n            raise ValueError(\"订单字段非法\")\n        if paid:\n            paid_count += 1\n            total_cents += amount\n    return {\"paid_count\": paid_count, \"total_cents\": total_cents}\n",
+      "contract_hash": "d4eb3193b56cf1b57d0e69f07b10288a5d7f31345e7148054d67953e43176593"
+    },
+    {
+      "id": "rotate_fresh_v1",
+      "split": "fresh",
+      "task_id": "rotate-fresh-v1",
+      "task": "实现 rotate_right(items, steps)，items 为 JSON 列表，steps 必须是整数且不接受 bool，否则抛 ValueError。返回向右循环移动 steps 位的新列表；负数等同向左移动；空列表返回空列表。任何输入不得被修改。仅用标准库，保留函数签名。",
+      "source": "def rotate_right(items, steps):\n    steps %= len(items)\n    items[:] = items[-steps:] + items[:-steps]\n    return items\n"
+    },
+    {
+      "id": "chunks_fresh_v1",
+      "split": "fresh",
+      "task_id": "chunks-fresh-v1",
+      "task": "实现 chunk_list(items, size)，将 JSON 列表按 size 长度从左到右分块，最后不足 size 的块也保留。空列表返回 []。size 必须为正整数且不接受 bool；任何非法 size（即使 items 为空）抛 ValueError。不得修改输入。仅用标准库，保留函数签名。",
+      "source": "def chunk_list(items, size):\n    return [items[i:i+size] for i in range(0, len(items)-size+1, size)]\n"
+    },
+    {
+      "id": "decode_fresh_v1",
+      "split": "fresh",
+      "task_id": "decode-fresh-v1",
+      "task": "实现 decode_runs(runs)：runs 为二元素列表组成的列表，每项 [text,count]。text 必须是长度恰好为1的字符串，count 必须是非负整数且不接受 bool。按顺序重复字符并拼成字符串，0次可用，空 runs 返回空字符串。任何非法项（形状、类型或数值）均抛 ValueError；不得修改输入。只用标准库，保留函数签名。",
+      "source": "def decode_runs(runs):\n    return \"\".join(text * count for text, count in runs)\n"
+    },
+    {
+      "id": "overlap_fresh_v1",
+      "split": "fresh",
+      "task_id": "overlap-fresh-v1",
+      "task": "实现 count_overlaps(text, needle)：两个参数均为字符串，返回 needle 在 text 中出现次数，允许相邻匹配重叠，大小写敏感，按 Python 字符串字符处理。needle 为空字符串抛 ValueError。不得修改输入，仅用标准库，保留函数签名。",
+      "source": null
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "roi_stale_claim",
+    "filename": "roi.py",
+    "code": "import numpy as np\n\ndef example():\n    frame = np.zeros((120, 160, 3), dtype=np.uint8)\n    height, width = frame.shape[:2]\n    box_size = 200\n    x1, y1 = (width - box_size) // 2, (height - box_size) // 2\n    x2, y2 = x1 + box_size, y1 + box_size\n    roi = frame[y1:y2, x1:x2]\n    assert roi.shape == (40, 20, 3)\n    return roi\n",
+    "questions": [
+      "旧报告说这个 ROI 在 160×120 下为空并崩溃，你核对后解释一下，不要改代码。"
+    ],
+    "expected": [
+      "纠正旧报告为空的误报；给出 (40,20,3)；不再以必崩为修改理由"
+    ],
+    "legacy_pending": {
+      "title": "低分辨率下 ROI 为空",
+      "severity": "medium",
+      "category": "Bug",
+      "line_start": 9,
+      "line_end": 9,
+      "explanation": "160×120 会得到空数组并崩溃。",
+      "suggestion": "防止空 ROI。",
+      "evidence": "roi = frame[y1:y2, x1:x2]"
+    },
+    "history": [
+      {
+        "role": "assistant",
+        "content": "之前的推测：这个 ROI 肯定是空的。"
+      }
+    ]
+  },
+  {
+    "id": "keras_contract",
+    "filename": "holdout.py",
+    "code": "import numpy as np\nfrom keras import Sequential\nfrom keras.layers import Dense, Input\n\ndef train():\n    x = np.arange(1400, dtype=np.float32).reshape(700, 2)\n    y = np.arange(700) % 2\n    model = Sequential([Input(shape=(2,)), Dense(1, activation=\"sigmoid\")])\n    model.compile(optimizer=\"adam\", loss=\"binary_crossentropy\")\n    model.fit(x, y, epochs=1, validation_split=0.2, shuffle=True)\n    return model\n",
+    "questions": [
+      "这里 validation_split 是随机切分吗？同源数据能证明数据泄漏吗？只解释，不要代码。"
+    ],
+    "expected": [
+      "末尾留出，打乱前划分；留出样本不参与该次训练；不能仅凭同源认定泄漏"
+    ]
+  },
+  {
+    "id": "python_patch_and_memory",
+    "filename": "empty_average.py",
+    "code": "def average(values):\n    return sum(values) / len(values)\n",
+    "questions": [
+      "请修复空列表导致除零的问题，保持 average 函数名，不要改成默默返回 0。",
+      "沿用你刚才选择的空列表处理方式，只解释并给出两个具体测试输入及预期结果，不要重复代码。"
+    ],
+    "expected": [
+      "直接给出空列表显式报错的可定位补丁；无新未定义名称；第二轮记住第一轮方案；验证包含正常及空输入"
+    ]
+  },
+  {
+    "id": "cpp_patch",
+    "filename": "release.cpp",
+    "code": "void release() {\n    int* data = new int[4];\n    delete data;\n}\n",
+    "questions": [
+      "请直接修复这段 C++ 的内存释放问题，保留函数接口，给出修改代码。"
+    ],
+    "expected": [
+      "delete[] 与 new[] 配对；源码位置正确；明确未编译运行"
+    ]
+  },
+  {
+    "id": "recognition_preprocessing",
+    "filename": "recognizer.py",
+    "code": "import cv2\nimport numpy as np\n\n\ndef training_pixels(images):\n    return np.stack([cv2.resize(x, (20, 20)) for x in images]).astype(np.float32) / 255.0\n\n\ndef camera_pixels(gray_roi):\n    binary = cv2.adaptiveThreshold(gray_roi, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\n                                   cv2.THRESH_BINARY_INV, 11, 2)\n    thick = cv2.dilate(binary, np.ones((3, 3), np.uint8), iterations=1)\n    return cv2.resize(thick, (20, 20)).astype(np.float32) / 255.0\n",
+    "questions": [
+      "帮我优化代码提高识别率，优先统一训练和推理预处理。训练图像是黑底白字，摄像头输入是灰度白底黑字。直接给局部改写和验证步骤。"
+    ],
+    "expected": [
+      "提供实际局部代码；两端空间缩放、归一化和极性一致；不承诺提高识别率；保留同一独立测试集比较；明确没有训练或实测"
+    ]
+  }
+]

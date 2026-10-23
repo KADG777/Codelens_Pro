@@ -1,0 +1,29 @@
+[
+  {
+    "id": "mnist_loading_preprocessing",
+    "filename": "preprocessing.py",
+    "code": "import cv2\nimport numpy as np\nimport tensorflow as tf\nfrom tensorflow.keras.datasets import mnist\n\ndef train(model):\n    (images, labels), _ = mnist.load_data()\n    mask = (labels == 0) | (labels == 1)\n    images, labels = images[mask], labels[mask]\n    images = tf.image.resize(images[..., None].astype(np.float32) / 255.0, (20, 20))\n    model.fit(images, labels, validation_split=0.2, epochs=3)\n\ndef predict(model, frame):\n    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)\n    binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)\n    dilated = cv2.dilate(binary, np.ones((3, 3), np.uint8), iterations=1)\n    image = cv2.resize(dilated, (20, 20)).astype(np.float32) / 255.0\n    return model.predict(image.reshape(1, 20, 20, 1), verbose=0)\n",
+    "expected": [
+      {"line": 10, "issue": "训练与推理预处理操作有差异，需同时引用训练 L10 与推理 L14–17；实际精度影响未验证"}
+    ],
+    "checks": ["不能由标准 MNIST 筛选 0/1 推断筛选为空", "下载异常提示仅是依赖环境的可选建议", "不能把 validation_split 同源说成已发生泄漏"]
+  },
+  {
+    "id": "conf_rule_location",
+    "filename": "confidence.py",
+    "code": "def classify(probability):\n    if probability < 0.1:\n        conf = 1 - probability\n        label = '0'\n    elif probability > 0.9:\n        conf = probability\n        label = '1'\n    else:\n        conf = max(probability, 1 - probability)\n        label = 'uncertain'\n    return label\n",
+    "expected": [
+      {"line": 9, "issue": "实际 Ruff F841 诊断对应 L9 的 conf 赋值；不能声称 L3/L6 获得同一诊断验证"}
+    ],
+    "checks": ["工具规则、引用行号与原始诊断一致", "未使用 conf 不能被夸大为已发生的识别率错误"]
+  },
+  {
+    "id": "reachable_filtered_empty",
+    "filename": "positive.py",
+    "code": "def first_positive(values):\n    selected = [value for value in values if value > 0]\n    return selected[0]\n",
+    "expected": [
+      {"line": 3, "issue": "first_positive([-1]) 筛选结果为空，selected[0] 越界；需要引用过滤条件 L2 与使用点 L3"}
+    ],
+    "checks": ["不能为避免误报而删除具备明确可达输入的真实缺陷", "不执行模型提供的任意代码"]
+  }
+]
