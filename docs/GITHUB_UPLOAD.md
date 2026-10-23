@@ -25,7 +25,7 @@ Set-Location -LiteralPath 'E:\大三上课程\软件工程项目实践\Codelens_
 git init -b main
 git add .
 git diff --cached --stat
-git commit -m "Initial release of Codelens Pro with CI"
+git commit -m "initial release"
 git remote add origin https://github.com/KADG777/Codelens_Pro.git
 git push -u origin main
 ```
@@ -55,9 +55,11 @@ CI 不需要添加 DeepSeek Secret，不会运行付费的真实模型对照实�
 git status
 git add .
 git diff --cached --stat
-git commit -m "Describe this change"
+git commit -m "second release"
 git push
 ```
+
+主要更新的提交标题按发布顺序命名：首次为 `initial release`，第二次为 `second release`，第三次为 `third release`，之后依次为 `fourth release`、`fifth release`。上面的命令展示第二次更新；再次更新时递增名称，具体改动可写入提交正文。
 
 `.gitignore` 已排除 `.env`、虚拟环境、用户上传、运行数据库和缓存；`.env.example` 是不含密钥的配置模板，可以提交。真实使用时把自己的密钥保存在本地 `.env`，无需推送到 GitHub。
 

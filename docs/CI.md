@@ -2,6 +2,8 @@
 
 配置文件：`.github/workflows/ci.yml`，名称 **Codelens Pro CI**。
 
+README 顶部的徽章读取 `main` 分支的实时工作流状态。通过后显示绿色 `passing`；点击可进入工作流页面。徽章与某个提交旁的检查图标是两个入口，不需要填写模型密钥。
+
 ## 触发与检查
 
 每次 push、Pull Request 和手动运行都会在 `windows-latest` / Python 3.12 中依次执行：
@@ -47,7 +49,7 @@ python -m venv .venv
 - `test-results-windows-python312`：JUnit 测试报告，便于记录失败与通过情况。
 - `Codelens_Pro-source`：验证后的源码 ZIP，内部顶层目录为 `Codelens_Pro/`。
 
-首次推送前没有远端运行记录；本地检查记录不能替代云端绿勾。
+首次推送的提交 `bf0953c` 已核验全部云端步骤通过：[运行记录](https://github.com/KADG777/Codelens_Pro/actions/runs/39895304122)。后续提交以各自的 Actions 记录为准，本地检查不能替代云端结果。
 
 使用的官方 Actions：[checkout](https://github.com/actions/checkout)、[setup-python](https://github.com/actions/setup-python)、[upload-artifact](https://github.com/actions/upload-artifact)。
 
@@ -57,4 +59,4 @@ python -m venv .venv
 
 本机另用项目内临时目录运行测试；第一次调用忘记创建其父目录，导致部分测试在准备阶段报错。补齐目录后完整重跑得到上述结果。GitHub 配置使用默认临时目录，不依赖这一本地参数。
 
-此记录仅是本地预验证；仓库首次推送后，还需查看 GitHub Actions 的真实运行结果。
+以上测试数量与耗时来自本地预验证；GitHub 的独立运行结果见上方链接。
