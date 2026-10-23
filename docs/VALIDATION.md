@@ -1,6 +1,6 @@
 # 当前验证记录
 
-本页记录 fourth release 的验证范围。此前版本的完整过程保存在 [历史验证记录](VALIDATION_HISTORY.md)。
+本页记录第四版实现的验证范围。此前版本的过程记录可从 [Git 提交历史](https://github.com/KADG777/Codelens_Pro/commits/main/) 查看；仓库仅保留当前验证说明和可复核的实验原始证据。
 
 ## 本地回归
 

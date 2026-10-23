@@ -96,6 +96,6 @@ flowchart LR
 | [系统设计](docs/DESIGN.md) / [画布](docs/EXECUTABLE_CANVAS.md) | 状态、路由、并行、版本和恢复语义 |
 | [优化与实验](docs/OPTIMIZATION.md) | 本轮改进、真实结果及限制 |
 | [Agent 扩展](docs/AGENT_EXTENSIONS.md) | 注册接口与可运行示例 |
-| [CI](docs/CI.md) / [发布](docs/GITHUB_UPLOAD.md) | 自动化检查及上传步骤 |
+| [CI](docs/CI.md) | 自动化检查、构建与源码包下载 |
 | [演示](docs/DEMO.md) | 展示流程 |
-| [历史实验](docs/AGENT_VALUE_EXPERIMENT.md) / [首轮对照](docs/PAIRED_COMPARISON.md) | 保留的原始评测证据 |
+| [协作实验总览](docs/AGENT_VALUE_EXPERIMENT.md) / [首轮对照](docs/PAIRED_COMPARISON.md) | 最新复测、历史协议与原始评测证据 |

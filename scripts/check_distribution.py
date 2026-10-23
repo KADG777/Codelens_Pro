@@ -16,7 +16,7 @@ from workflow.wasi_runtime import ARCHIVE_NAME, ARCHIVE_SHA256, runtime_availabl
 REQUIRED = {
     "app.py", ".github/workflows/ci.yml", ".gitignore", ".env.example",
     "requirements-dev.txt", "requirements-lock.txt", "README.md",
-    "docs/GITHUB_UPLOAD.md", "docs/CI.md", "scripts/check_distribution.py",
+    "docs/CI.md", "scripts/check_distribution.py",
     "start.cmd", "install.cmd", "sandbox_runtime/LICENSE",
     "ui/canvas_component/index.html",
     f"sandbox_runtime/{ARCHIVE_NAME}",

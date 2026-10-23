@@ -58,7 +58,7 @@ python -m venv .venv
 
 ## 验证记录与密钥检查
 
-当前测试范围及最近结果见 [验证记录](VALIDATION.md)，旧版本过程保存在 [历史记录](VALIDATION_HISTORY.md)。模型复测单独运行，不能把历史 API 结果当作本次 CI 的模型测试。
+当前测试范围及最近结果见 [验证记录](VALIDATION.md)，旧版本过程可从 [Git 提交历史](https://github.com/KADG777/Codelens_Pro/commits/main/) 查看。模型复测单独运行，不能把历史 API 结果当作本次 CI 的模型测试。
 
 本地指定 `--basetemp` 时先创建父目录；CI 使用默认临时目录。
 
