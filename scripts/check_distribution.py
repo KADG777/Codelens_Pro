@@ -18,6 +18,7 @@ REQUIRED = {
     "requirements-dev.txt", "requirements-lock.txt", "README.md",
     "docs/GITHUB_UPLOAD.md", "docs/CI.md", "scripts/check_distribution.py",
     "start.cmd", "install.cmd", "sandbox_runtime/LICENSE",
+    "ui/canvas_component/index.html",
     f"sandbox_runtime/{ARCHIVE_NAME}",
 }
 PRIVATE_DIRS = {

@@ -13,7 +13,8 @@ README 顶部的徽章读取 `main` 分支的实时工作流状态。通过后�
 3. 检查发布文件选择、必需文档和 WASI 归档 SHA-256；缺少运行时或 Wasmtime 直接失败，不能把跳过功能验收测试当作通过。
 4. 执行 `tests/` 和 `tests_workflow/` 的完整 pytest 测试，并生成 JUnit XML。
 5. 生成 `dist/Codelens_Pro.zip`，检查归档路径、文件清单、逐文件 SHA-256 和必需文件。
-6. 上传测试报告；前面全部通过时上传源码包。Artifacts 保留 14 天。
+6. 检查源文件、Git 暂存内容、完整提交历史和源码包中的疑似模型密钥；命中就失败，输出只包含文件名，不打印密钥或匹配行。
+7. 上传测试报告；前面全部通过时上传源码包。Artifacts 保留 14 天。
 
 采用 Windows runner 是为了实际覆盖中文路径、CMD / PowerShell 启动器和本地运行环境。当前 CI 不宣称覆盖 Linux、macOS 或所有 Python 版本。
 
@@ -35,9 +36,11 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pip check
 .\.venv\Scripts\python.exe -m ruff check .
 .\.venv\Scripts\python.exe scripts/check_distribution.py
+.\.venv\Scripts\python.exe scripts/check_secrets.py --history
 .\.venv\Scripts\python.exe -m pytest tests tests_workflow -q --junitxml=reports/tests.xml
 .\.venv\Scripts\python.exe package_release.py --output dist/Codelens_Pro.zip
 .\.venv\Scripts\python.exe scripts/check_distribution.py --archive dist/Codelens_Pro.zip
+.\.venv\Scripts\python.exe scripts/check_secrets.py --archive dist/Codelens_Pro.zip
 ```
 
 安装依赖需要网络；后续测试无需模型服务。不要把 `data/`、`reports/`、`.venv/` 或 `dist/` 强制加入 Git。
@@ -57,6 +60,12 @@ python -m venv .venv
 
 在本项目新建的 Python 3.12.9 虚拟环境中，按上述锁定约束重新安装全部依赖。依赖冲突检查、全项目 Ruff 检查、发布文件检查通过；完整测试 **384 passed in 141.22s**，没有跳过测试。模型 API Key 为空。
 
-本机另用项目内临时目录运行测试；第一次调用忘记创建其父目录，导致部分测试在准备阶段报错。补齐目录后完整重跑得到上述结果。GitHub 配置使用默认临时目录，不依赖这一本地参数。
+本地指定 `--basetemp` 时应先创建其父目录。GitHub 配置使用默认临时目录。
 
 以上测试数量与耗时来自本地预验证；GitHub 的独立运行结果见上方链接。
+
+凭证检查不需要把真实密钥放进 GitHub Secrets。本机存在 `DEEPSEEK_API_KEY` 环境变量时，检查器还会对实际值做精确匹配；CI 的空密钥环境只进行格式规则检测。格式规则不能覆盖所有类型的秘密，提交前仍应保留 `.gitignore` 并检查新增文件范围。
+
+## third release 本地回归
+
+完整测试 **410 passed in 150.50s**，无跳过。新增画布和凭证检查均纳入相同 CI；模型复测另行运行，不把历史 API 结果当作本次 CI 的模型测试。

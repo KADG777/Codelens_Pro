@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import threading
 import time
 from dataclasses import replace
 from datetime import datetime, timezone
@@ -58,6 +59,8 @@ class ExperimentBudget:
         self.max_calls, self.max_tokens = max_calls, max_tokens
         self.calls = self.charged_tokens = self.actual_tokens = 0
         self.client_factory = client_factory
+        self.lock = threading.Lock()
+        self.reserved_tokens = 0
 
     def factory(self, role, settings):
         budget = self
@@ -69,17 +72,23 @@ class ExperimentBudget:
 
             def complete(self, messages, *, tools=None, json_output=False, max_tokens=6000):
                 estimate = len(json.dumps({"messages": messages, "tools": tools}, ensure_ascii=False).encode("utf-8")) + 1024
-                if budget.calls >= budget.max_calls or budget.max_tokens - budget.charged_tokens - estimate < 256:
-                    raise BudgetExceeded("同任务对照实验总预算耗尽；保留未执行项，不补跑挑选结果。")
-                cap = min(max_tokens, budget.max_tokens - budget.charged_tokens - estimate)
+                with budget.lock:
+                    available = budget.max_tokens - budget.charged_tokens - budget.reserved_tokens
+                    if budget.calls >= budget.max_calls or available - estimate < 256:
+                        raise BudgetExceeded("同任务对照实验总预算耗尽；保留未执行项，不补跑挑选结果。")
+                    cap = min(max_tokens, available - estimate)
+                    reservation = estimate + cap
+                    budget.reserved_tokens += reservation
+                    budget.calls += 1
                 before = self.metrics.prompt_tokens + self.metrics.completion_tokens
-                budget.calls += 1
                 try:
                     return inner.complete(messages, tools=tools, json_output=json_output, max_tokens=cap)
                 finally:
                     actual = max(0, self.metrics.prompt_tokens + self.metrics.completion_tokens - before)
-                    budget.actual_tokens += actual
-                    budget.charged_tokens += actual if actual else estimate + cap
+                    with budget.lock:
+                        budget.reserved_tokens -= reservation
+                        budget.actual_tokens += actual
+                        budget.charged_tokens += actual if actual else reservation
 
             def close(self):
                 inner.close()

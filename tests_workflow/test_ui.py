@@ -16,6 +16,34 @@ from workflow.examples import BUGGY_ORDERS, CORRECT_ORDERS, ORDER_TASK
 APP_PATH = Path(__file__).resolve().parents[1] / "app.py"
 
 
+def test_canvas_mode_executes_and_keeps_source_diff(workspace):
+    from workflow.canvas import template_graph
+    app, directory = workspace
+    app.session_state["flow_canvas_graph"] = template_graph(True)
+    app.checkbox(key="flow_canvas_mode").check().run()
+    assert_no_page_error(app)
+    app.button(key="flow_start").click().run()
+    assert_no_page_error(app)
+    state = snapshot(app, directory)
+    assert state["status"] == "completed_static" and state["canvas_hash"]
+    assert len(state["versions"]) == 2 and state["canvas_edges"]
+    assert "修改后源码" in comparison_markup(app)
+
+
+def test_invalid_canvas_stops_before_creating_history(workspace):
+    from workflow.canvas import template_graph
+    app, directory = workspace
+    graph = template_graph()
+    graph["edges"].append({"source": "validate", "target": "review", "when": "always"})
+    app.session_state["flow_canvas_graph"] = graph
+    app.checkbox(key="flow_canvas_mode").check().run()
+    app.button(key="flow_start").click().run()
+    assert_no_page_error(app)
+    assert any("循环" in e.value for e in app.error)
+    with closing(WorkflowRunService(directory / "workflow.sqlite3")) as service:
+        assert not service.list_runs()
+
+
 def assert_no_page_error(app: AppTest) -> None:
     assert not app.exception, [item.value for item in app.exception]
 

@@ -54,7 +54,7 @@ class NodeRegistry:
         self._nodes: dict[str, NodeSpec] = {}
 
     def register(self, spec: NodeSpec) -> None:
-        if not re.fullmatch(r"[a-z][a-z0-9_]{0,47}", spec.id) or spec.id in {*CORE_NODES, "dispatch", "pause", "finish"}:
+        if not re.fullmatch(r"[a-z][a-z0-9_]{0,47}", spec.id) or spec.id.startswith("condition_") or spec.id in {*CORE_NODES, "dispatch", "pause", "finish", "canvas"}:
             raise ValueError("扩展节点 ID 非法或占用了系统节点。")
         if spec.id in self._nodes or not spec.version or not callable(spec.handler):
             raise ValueError("扩展节点需要唯一 ID、版本和处理函数。")

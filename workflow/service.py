@@ -77,6 +77,9 @@ class WorkflowRunService:
         node_names = [*CORE_NODES, *(spec.id for spec in self.node_registry.all())]
         for name in node_names:
             graph.add_node(name, self._node(name, settings, on_event))
+        from workflow.canvas_runtime import step
+        graph.add_node("canvas", lambda state: step(self, state, settings, on_event))
+        node_names.append("canvas")
 
         def pause(state):
             data = copy.deepcopy(state["data"])
@@ -121,6 +124,9 @@ class WorkflowRunService:
             raise ValueError("工作流配置必须是结构化对象。")
         config_data = workflow_config.model_dump() if isinstance(workflow_config, WorkflowConfig) else (workflow_config or {})
         plan = WorkflowConfig.model_validate({"max_fix_rounds": max_fix_rounds, **config_data})
+        if plan.canvas:
+            plan.canvas.validate_for(self.node_registry)
+            plan.extension_nodes = plan.canvas.extensions()
         extension_manifest = self.node_registry.manifest(plan.extension_nodes)
         filename = filename.replace("\\", "/").rsplit("/", 1)[-1]
         if not filename.lower().endswith(".py"):
@@ -167,6 +173,8 @@ class WorkflowRunService:
                 "metrics": {"model_calls": 0, "http_attempts": 0, "prompt_tokens": 0,
                             "completion_tokens": 0, "tool_calls": 0, "active_seconds": 0.0,
                             "scripted_actions": 0}}
+        if plan.canvas:
+            data.update(next_node="canvas", canvas_hash=plan.canvas.digest(), canvas_cursor={"outcomes": {}, "repair": False}, canvas_edges=[])
         event(data, "create", "created", "离线预设流程；不调用真实模型。" if mode == "demo" else "真实模型运行；凭证仅运行时注入。")
         self._graph().update_state(self._config(run_id), {"data": data}, as_node="dispatch")
         return run_id
@@ -222,6 +230,8 @@ class WorkflowRunService:
         inherited = parent.get("inherited_total_metrics", parent.get("inherited_metrics", {}))
         fresh["inherited_total_metrics"] = {key: parent["metrics"].get(key, 0) + inherited.get(key, 0)
                                              for key in fresh["metrics"]}
+        if fresh.get("canvas_hash"):
+            fresh.update(next_node="canvas", canvas_cursor={"outcomes": {}, "repair": True})
         event(fresh, "retry_repair", "created", "从父记录当前源码和同哈希审查目标重新修复；使用独立新预算，父记录保持不变。")
         self._graph().update_state(self._config(new_id), {"data": fresh}, as_node="dispatch")
         return new_id
@@ -531,6 +541,11 @@ class WorkflowRunService:
                 return previous
             try:
                 validate_configuration(previous["validation_profile"], previous["acceptance_id"])
+                checked_plan = WorkflowConfig.model_validate(previous.get("workflow_config", {}))
+                if checked_plan.canvas:
+                    checked_plan.canvas.validate_for(self.node_registry)
+                    if checked_plan.canvas.digest() != previous.get("canvas_hash"):
+                        raise ValueError("已冻结的画布发生变化，请建立新运行。")
                 manifest = self.node_registry.manifest(previous.get("workflow_config", {}).get("extension_nodes", []))
                 if manifest != previous.get("extension_manifest", {}):
                     raise ValueError("扩展节点版本已变化，请恢复原版本或新建任务。")
@@ -541,23 +556,29 @@ class WorkflowRunService:
                 graph.update_state(config, {"data": previous}, as_node="dispatch")
                 return self.get_snapshot(run_id)
             plan = previous.get("workflow_config", {})
+            canvas_mode = bool(plan.get("canvas"))
             if stop_after is None and plan.get("pause_after_review") and not previous.get("inspection_cycles", 0):
                 stop_after = "review"
-            if plan.get("parallel_checks") and stop_after in {"review", "validate"}:
+            if not canvas_mode and plan.get("parallel_checks") and stop_after in {"review", "validate"}:
                 stop_after = "inspect"  # Branches finish together before a durable pause.
             raw = graph.get_state(config)
             has_interrupt = any(getattr(task, "interrupts", ()) for task in raw.tasks)
             command = Command(resume=True) if has_interrupt else None
             previous_event_id = previous["events"][-1]["id"] if previous["events"] else None
             _EXECUTING.add((self.db_path, run_id))
+            seen_records = len(previous.get("node_runs", []))
             for value in graph.stream(command, config, stream_mode="values", durability="sync",
-                                      interrupt_after=[stop_after] if stop_after else None):
+                                      interrupt_after=[stop_after] if stop_after and not canvas_mode else None):
                 if on_event is not None and isinstance(value, dict) and "data" in value:
                     committed = self.get_snapshot(run_id)
                     latest = committed["events"][-1] if committed["events"] else None
                     if latest and latest["id"] != previous_event_id:
                         self._notify(committed, on_event, kind="node_end", node=latest["node"], active_nodes=[], transient=False)
                         previous_event_id = latest["id"]
+                if canvas_mode and stop_after and isinstance(value, dict) and "data" in value:
+                    new_records = value["data"].get("node_runs", [])[seen_records:]
+                    if any(r["node"] == stop_after and not r.get("error") for r in new_records):
+                        break
             _EXECUTING.discard((self.db_path, run_id))
             return self.get_snapshot(run_id)
         finally:

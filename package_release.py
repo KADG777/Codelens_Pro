@@ -11,7 +11,7 @@ EXCLUDED_DIRS = {
     ".git", ".venv", "__pycache__", ".pytest_cache", ".ruff_cache", ".test-tmp",
     "data", "reports", "dist",
 }
-ALLOWED_SUFFIXES = {".py", ".md", ".txt", ".toml", ".json", ".cmd", ".ps1", ".cpp", ".h", ".yml"}
+ALLOWED_SUFFIXES = {".py", ".md", ".txt", ".toml", ".json", ".cmd", ".ps1", ".cpp", ".h", ".yml", ".html", ".js", ".css"}
 EXCLUDED_FILES = {"examples/1.py"}  # Personal upload inherited from the Homework 1 snapshot.
 
 

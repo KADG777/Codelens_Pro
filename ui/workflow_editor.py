@@ -29,6 +29,8 @@ def _reset_plan() -> None:
     st.session_state.flow_max_rounds = 2
     st.session_state.flow_pause = False
     st.session_state.flow_extensions = []
+    st.session_state.flow_canvas_graph = None
+    st.session_state.flow_canvas_mode = False
 
 
 def build_plan_svg(plan: dict, selected: str = "review") -> str:
@@ -65,10 +67,15 @@ def render_workflow_editor() -> dict:
             help="按选择顺序执行，统一输入输出合同与运行预算；解读建议不会改变独立验收结论。")
         plan = {"parallel_checks": execution == "并行执行", "max_fix_rounds": int(rounds),
                 "enable_repair": bool(enable), "pause_after_review": bool(pause), "extension_nodes": extensions}
+        if st.checkbox("使用拖拽连线画布执行", key="flow_canvas_mode"):
+            from ui.canvas_editor import render_canvas
+            plan = render_canvas(plan, default_registry())
         st.session_state.flow_workflow_config = plan
         st.markdown(build_plan_svg(plan, selected), unsafe_allow_html=True)
         path = "编码 → [ 审查 ∥ 独立验收 ] → 汇合判断" if plan["parallel_checks"] else "编码 → 审查 → 独立验收 → 判断"
         loop = f"发现问题 → 修复（最多 {rounds} 轮）→ 返回审查与验收" if enable and rounds else "发现问题 → 保留源码与问题清单，不执行修复"
+        if plan.get("canvas"):
+            path = "执行采用上方已应用画布的连线；顺序 / 并行设置仅用于重建画布模板。"
         st.info(f"{path}\n\n{loop}" + ("\n\n已开启暂停；已提交节点不会在继续时重复执行。" if pause else ""))
         st.button("恢复默认流程", on_click=_reset_plan, key="flow_reset_plan")
     return plan

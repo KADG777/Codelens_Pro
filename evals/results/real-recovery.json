@@ -1,0 +1,1707 @@
+{
+  "kind": "real_api_recovery",
+  "real_api_used": true,
+  "primary_sha256": "c8f658655750f3992a9a6240398f5844c82c15ccfc2fc037935cb96da6d5d31f",
+  "primary_score_unchanged": true,
+  "case_id": "av-layers-v1-r1",
+  "run_id": "b656bc16677242b684d49d188d986529",
+  "created_at": "2026-10-23T04:22:26.106031+00:00",
+  "extra_budget": {
+    "calls": 55,
+    "tokens": 141904
+  },
+  "completed_at": "2026-10-23T04:22:37.902237+00:00",
+  "before_status": "blocked",
+  "after_status": "completed_verified",
+  "resumed_node": "fix",
+  "preserved_prior_records": true,
+  "candidate": {
+    "code": "def dependency_layers(dependencies):\n    nodes = set()\n    for task, prereqs in dependencies.items():\n        nodes.add(task)\n        for prereq in prereqs:\n            nodes.add(prereq)\n\n    indegree = {node: 0 for node in nodes}\n    successors = {node: set() for node in nodes}\n    for task, prereqs in dependencies.items():\n        for prereq in set(prereqs):\n            if task not in successors[prereq]:\n                successors[prereq].add(task)\n                indegree[task] += 1\n\n    remaining = set(nodes)\n    layers = []\n    while remaining:\n        ready = sorted(node for node in remaining if indegree[node] == 0)\n        if not ready:\n            raise ValueError(\"dependency cycle detected\")\n        layers.append(ready)\n        for node in ready:\n            remaining.discard(node)\n            for succ in successors[node]:\n                indegree[succ] -= 1\n\n    return layers\n",
+    "audits": {
+      "public": {
+        "status": "passed",
+        "executed": true,
+        "checks": [
+          {
+            "id": "p1",
+            "name": "p1",
+            "status": "passed",
+            "detail": "实际返回 [['a'], ['b']]",
+            "expected": "[['a'], ['b']]",
+            "actual": [
+              [
+                "a"
+              ],
+              [
+                "b"
+              ]
+            ]
+          },
+          {
+            "id": "p2",
+            "name": "p2",
+            "status": "passed",
+            "detail": "实际返回 []",
+            "expected": "[]",
+            "actual": []
+          },
+          {
+            "id": "p3",
+            "name": "p3",
+            "status": "passed",
+            "detail": "抛出 builtins.ValueError",
+            "expected": "ValueError",
+            "actual": null
+          },
+          {
+            "id": "p4",
+            "name": "p4",
+            "status": "passed",
+            "detail": "实际返回 [['a'], ['z']]",
+            "expected": "[['a'], ['z']]",
+            "actual": [
+              [
+                "a"
+              ],
+              [
+                "z"
+              ]
+            ]
+          }
+        ],
+        "passed_count": 4,
+        "failed_count": 0,
+        "error": "",
+        "backend": "cpython-wasi",
+        "holdout": false,
+        "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "acceptance_id": "av-layers-v1",
+        "elapsed_seconds": 1.0198
+      },
+      "holdout": {
+        "status": "passed",
+        "executed": true,
+        "checks": [
+          {
+            "id": "h1",
+            "name": "h1",
+            "status": "passed",
+            "detail": "实际返回 [['a'], ['b', 'c'], ['d']]",
+            "expected": "[['a'], ['b', 'c'], ['d']]",
+            "actual": [
+              [
+                "a"
+              ],
+              [
+                "b",
+                "c"
+              ],
+              [
+                "d"
+              ]
+            ]
+          },
+          {
+            "id": "h2",
+            "name": "h2",
+            "status": "passed",
+            "detail": "抛出 builtins.ValueError",
+            "expected": "ValueError",
+            "actual": null
+          },
+          {
+            "id": "h3",
+            "name": "h3",
+            "status": "passed",
+            "detail": "实际返回 [['a', 'c'], ['b'], ['d']]",
+            "expected": "[['a', 'c'], ['b'], ['d']]",
+            "actual": [
+              [
+                "a",
+                "c"
+              ],
+              [
+                "b"
+              ],
+              [
+                "d"
+              ]
+            ]
+          },
+          {
+            "id": "h4",
+            "name": "h4",
+            "status": "passed",
+            "detail": "实际返回 [['q'], ['x', 'y']]",
+            "expected": "[['q'], ['x', 'y']]",
+            "actual": [
+              [
+                "q"
+              ],
+              [
+                "x",
+                "y"
+              ]
+            ]
+          },
+          {
+            "id": "h5",
+            "name": "h5",
+            "status": "passed",
+            "detail": "实际返回 [['A', 'B', 'a']]",
+            "expected": "[['A', 'B', 'a']]",
+            "actual": [
+              [
+                "A",
+                "B",
+                "a"
+              ]
+            ]
+          },
+          {
+            "id": "h6",
+            "name": "h6",
+            "status": "passed",
+            "detail": "抛出 builtins.ValueError",
+            "expected": "ValueError",
+            "actual": null
+          },
+          {
+            "id": "h7",
+            "name": "h7",
+            "status": "passed",
+            "detail": "实际返回 [['a', 'b']]",
+            "expected": "[['a', 'b']]",
+            "actual": [
+              [
+                "a",
+                "b"
+              ]
+            ]
+          }
+        ],
+        "passed_count": 7,
+        "failed_count": 0,
+        "error": "",
+        "backend": "cpython-wasi",
+        "holdout": true,
+        "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "acceptance_id": "av-layers-v1",
+        "elapsed_seconds": 0.9463
+      }
+    }
+  },
+  "independent_outcome": "passed",
+  "new_node_runs": [
+    {
+      "id": "29fb3417a4cc4c978ec6de40f5e0b855",
+      "node": "fix",
+      "started_at": "2026-10-23T04:22:26.171473+00:00",
+      "finished_at": "2026-10-23T04:22:29.227490+00:00",
+      "duration_seconds": 3.063,
+      "round": 0,
+      "status": "running",
+      "error": "",
+      "input": {
+        "source_version": "v0",
+        "code_hash": "91e196b683206202cb16bcc63c9d3bac82072686d44d0e79f78a7294509b873f",
+        "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+        "acceptance_id": "av-layers-v1",
+        "fix_round": 0,
+        "next_node": "fix",
+        "status": "running",
+        "termination_reason": "",
+        "review": {
+          "code_hash": "91e196b683206202cb16bcc63c9d3bac82072686d44d0e79f78a7294509b873f",
+          "complete": true,
+          "findings": [
+            {
+              "title": "实现未做拓扑分层，仅把 key 排序后作为单批返回",
+              "severity": "high",
+              "category": "Bug",
+              "line_start": 2,
+              "line_end": 2,
+              "explanation": "函数直接返回 [sorted(dependencies)]，即所有 key 一次性作为唯一批次。例如 {\"a\": [\"b\"], \"b\": []} 应返回 [[\"b\"], [\"a\"]]，实际返回 [[\"a\", \"b\"]]，违反“每批前置均已在更早批次完成”的合同。",
+              "suggestion": "按入度做 Kahn 分层：每轮收集入度为 0 的剩余任务，排序后作为一批，再移除其出边；直到无剩余任务。",
+              "evidence": "return [sorted(dependencies)] if dependencies else []",
+              "rule_id": "",
+              "evidence_role": "related",
+              "related_evidence": [],
+              "trigger": "dependency_layers({\"a\": [\"b\"], \"b\": []})",
+              "trigger_basis": "local_input",
+              "verification": "reviewed",
+              "review_note": "第2行仅返回 sorted(dependencies) 单批，未按前置关系分层；{\"a\":[\"b\"],\"b\":[]} 会返回 [[\"a\",\"b\"]] 而非 [[\"b\"],[\"a\"]]。",
+              "impact": "",
+              "verification_hint": "",
+              "id": "F-1"
+            },
+            {
+              "title": "只作为前置出现的任务未加入图",
+              "severity": "high",
+              "category": "Bug",
+              "line_start": 2,
+              "line_end": 2,
+              "explanation": "结果只来自 dependencies 的 key，value 中的前置任务若未作为 key 出现则完全丢失。例如 {\"a\": [\"b\"]} 应返回 [[\"b\"], [\"a\"]]，实际返回 [[\"a\"]]，前置 b 缺失。",
+              "suggestion": "先遍历所有 key 与 value 中的任务建立节点集合，再基于该集合计算入度与分层。",
+              "evidence": "return [sorted(dependencies)] if dependencies else []",
+              "rule_id": "",
+              "evidence_role": "related",
+              "related_evidence": [],
+              "trigger": "dependency_layers({\"a\": [\"b\"]})",
+              "trigger_basis": "local_input",
+              "verification": "reviewed",
+              "review_note": "第2行只遍历 dict 的 key，value 中仅作前置的任务不会出现在结果；{\"a\":[\"b\"]} 返回 [[\"a\"]]，丢失 b。",
+              "impact": "",
+              "verification_hint": "",
+              "id": "F-2"
+            },
+            {
+              "title": "循环依赖未检测，未抛 ValueError",
+              "severity": "high",
+              "category": "Bug",
+              "line_start": 2,
+              "line_end": 2,
+              "explanation": "合同要求任意连通分量存在环（含自环）时抛 ValueError 且不返回部分批次。当前实现无条件返回排序后的 key，例如 {\"a\": [\"a\"]} 或 {\"a\": [\"b\"], \"b\": [\"a\"]} 都正常返回，掩盖了循环。",
+              "suggestion": "分层结束后若仍有未处理节点，说明存在环，抛出 ValueError；自环可通过入度自增自然覆盖。",
+              "evidence": "return [sorted(dependencies)] if dependencies else []",
+              "rule_id": "",
+              "evidence_role": "related",
+              "related_evidence": [],
+              "trigger": "dependency_layers({\"a\": [\"a\"]})",
+              "trigger_basis": "local_input",
+              "verification": "reviewed",
+              "review_note": "第2行无任何环检测，自环 {\"a\":[\"a\"]} 或互环均直接返回排序 key，未按合同抛 ValueError。",
+              "impact": "",
+              "verification_hint": "",
+              "id": "F-3"
+            }
+          ],
+          "pending_findings": [],
+          "summary": "本次保留 3 条问题与建议（静态规则命中 0 条，模型复核支持 3 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+          "requirements_status": "gap",
+          "requirements_reason": "当前实现仅返回 [sorted(dependencies)]（或空列表），未满足任务要求：未将仅作为前置出现的任务纳入图中，未去重前置，未按依赖层级分批（每批仅包含前置均已完成的任务），未检测循环（含自环）并抛出 ValueError，也未保证不修改原字典或列表。因此与显式任务存在明确差距。",
+          "report": {
+            "schema_version": 5,
+            "filename": "solution.py",
+            "language": "python",
+            "source_hash": "91e196b68320",
+            "mode": "deepseek",
+            "model": "deepseek-flash",
+            "strategy": "full",
+            "summary": "本次保留 3 条问题与建议（静态规则命中 0 条，模型复核支持 3 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+            "findings": [
+              {
+                "title": "实现未做拓扑分层，仅把 key 排序后作为单批返回",
+                "severity": "high",
+                "category": "Bug",
+                "line_start": 2,
+                "line_end": 2,
+                "explanation": "函数直接返回 [sorted(dependencies)]，即所有 key 一次性作为唯一批次。例如 {\"a\": [\"b\"], \"b\": []} 应返回 [[\"b\"], [\"a\"]]，实际返回 [[\"a\", \"b\"]]，违反“每批前置均已在更早批次完成”的合同。",
+                "suggestion": "按入度做 Kahn 分层：每轮收集入度为 0 的剩余任务，排序后作为一批，再移除其出边；直到无剩余任务。",
+                "evidence": "return [sorted(dependencies)] if dependencies else []",
+                "rule_id": "",
+                "evidence_role": "related",
+                "related_evidence": [],
+                "trigger": "dependency_layers({\"a\": [\"b\"], \"b\": []})",
+                "trigger_basis": "local_input",
+                "verification": "reviewed",
+                "review_note": "第2行仅返回 sorted(dependencies) 单批，未按前置关系分层；{\"a\":[\"b\"],\"b\":[]} 会返回 [[\"a\",\"b\"]] 而非 [[\"b\"],[\"a\"]]。",
+                "impact": "",
+                "verification_hint": ""
+              },
+              {
+                "title": "只作为前置出现的任务未加入图",
+                "severity": "high",
+                "category": "Bug",
+                "line_start": 2,
+                "line_end": 2,
+                "explanation": "结果只来自 dependencies 的 key，value 中的前置任务若未作为 key 出现则完全丢失。例如 {\"a\": [\"b\"]} 应返回 [[\"b\"], [\"a\"]]，实际返回 [[\"a\"]]，前置 b 缺失。",
+                "suggestion": "先遍历所有 key 与 value 中的任务建立节点集合，再基于该集合计算入度与分层。",
+                "evidence": "return [sorted(dependencies)] if dependencies else []",
+                "rule_id": "",
+                "evidence_role": "related",
+                "related_evidence": [],
+                "trigger": "dependency_layers({\"a\": [\"b\"]})",
+                "trigger_basis": "local_input",
+                "verification": "reviewed",
+                "review_note": "第2行只遍历 dict 的 key，value 中仅作前置的任务不会出现在结果；{\"a\":[\"b\"]} 返回 [[\"a\"]]，丢失 b。",
+                "impact": "",
+                "verification_hint": ""
+              },
+              {
+                "title": "循环依赖未检测，未抛 ValueError",
+                "severity": "high",
+                "category": "Bug",
+                "line_start": 2,
+                "line_end": 2,
+                "explanation": "合同要求任意连通分量存在环（含自环）时抛 ValueError 且不返回部分批次。当前实现无条件返回排序后的 key，例如 {\"a\": [\"a\"]} 或 {\"a\": [\"b\"], \"b\": [\"a\"]} 都正常返回，掩盖了循环。",
+                "suggestion": "分层结束后若仍有未处理节点，说明存在环，抛出 ValueError；自环可通过入度自增自然覆盖。",
+                "evidence": "return [sorted(dependencies)] if dependencies else []",
+                "rule_id": "",
+                "evidence_role": "related",
+                "related_evidence": [],
+                "trigger": "dependency_layers({\"a\": [\"a\"]})",
+                "trigger_basis": "local_input",
+                "verification": "reviewed",
+                "review_note": "第2行无任何环检测，自环 {\"a\":[\"a\"]} 或互环均直接返回排序 key，未按合同抛 ValueError。",
+                "impact": "",
+                "verification_hint": ""
+              }
+            ],
+            "pending_findings": [],
+            "verification_records": [
+              {
+                "finding_id": 1,
+                "title": "实现未做拓扑分层，仅把 key 排序后作为单批返回",
+                "status": "accepted",
+                "reason": "第2行仅返回 sorted(dependencies) 单批，未按前置关系分层；{\"a\":[\"b\"],\"b\":[]} 会返回 [[\"a\",\"b\"]] 而非 [[\"b\"],[\"a\"]]。"
+              },
+              {
+                "finding_id": 2,
+                "title": "只作为前置出现的任务未加入图",
+                "status": "accepted",
+                "reason": "第2行只遍历 dict 的 key，value 中仅作前置的任务不会出现在结果；{\"a\":[\"b\"]} 返回 [[\"a\"]]，丢失 b。"
+              },
+              {
+                "finding_id": 3,
+                "title": "循环依赖未检测，未抛 ValueError",
+                "status": "accepted",
+                "reason": "第2行无任何环检测，自环 {\"a\":[\"a\"]} 或互环均直接返回排序 key，未按合同抛 ValueError。"
+              },
+              {
+                "finding_id": 4,
+                "title": "重复前置未去重，可能影响入度计算",
+                "status": "rejected",
+                "reason": "当前实现根本不计算入度，重复前置不会造成所述误判为环；该机制只在假设的未来实现中成立。"
+              }
+            ],
+            "semantic_facts": [],
+            "calculations": [],
+            "limitations": [
+              "源码事实与静态规则有适用条件；未执行代码或测试，模型复核仍可能误报或漏报。",
+              "源码仅两行，未包含任何图构建、入度或循环检测逻辑，因此上述问题均为实现缺失而非局部边界错误。",
+              "未执行代码或测试，结论基于源码静态阅读与合同对比。"
+            ],
+            "reflection_status": "completed",
+            "checks": {
+              "Python 语法与结构": "completed",
+              "内置 AST 规则": "completed",
+              "Ruff 静态检查": "completed"
+            },
+            "events": [
+              {
+                "stage": "输入校验",
+                "detail": "solution.py · Python · 2 行 · 快照 91e196b68320"
+              },
+              {
+                "stage": "源码事实核对",
+                "detail": "提取 0 条计算/API 事实；未执行被审查代码。"
+              },
+              {
+                "stage": "工具规划",
+                "detail": "第 1 轮：可继续调用工具，也可直接输出报告 JSON。"
+              },
+              {
+                "stage": "工具执行",
+                "detail": "parse_structure · 结果已返回"
+              },
+              {
+                "stage": "工具执行",
+                "detail": "run_static_checks · 结果已返回"
+              },
+              {
+                "stage": "工具反馈与初审",
+                "detail": "第 2 轮：可继续调用工具，也可直接输出报告 JSON。"
+              },
+              {
+                "stage": "证据校验",
+                "detail": "4 条候选需复核（高/中优先级或证据链/工具背书检查）；普通低优先级意见仍可待确认。"
+              },
+              {
+                "stage": "反思复核",
+                "detail": "按事实逐条返回简短裁决，仅修正必要字段。"
+              },
+              {
+                "stage": "报告完成",
+                "detail": "保留 3 条问题与建议，0 条待确认。"
+              }
+            ],
+            "metrics": {
+              "model_calls": 3,
+              "http_attempts": 3,
+              "tool_calls": 2,
+              "prompt_tokens": 9578,
+              "completion_tokens": 1182,
+              "elapsed_seconds": 7.13,
+              "stages": [
+                {
+                  "stage": "源码事实核对",
+                  "kind": "local",
+                  "elapsed_seconds": 0.0,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "工具规划",
+                  "kind": "model",
+                  "elapsed_seconds": 0.629,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3195,
+                  "completion_tokens": 37,
+                  "status": "completed"
+                },
+                {
+                  "stage": "parse_structure",
+                  "kind": "tool",
+                  "elapsed_seconds": 0.0,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "run_static_checks",
+                  "kind": "tool",
+                  "elapsed_seconds": 0.176,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "工具反馈与初审",
+                  "kind": "model",
+                  "elapsed_seconds": 4.571,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3293,
+                  "completion_tokens": 854,
+                  "status": "completed"
+                },
+                {
+                  "stage": "证据校验",
+                  "kind": "local",
+                  "elapsed_seconds": 0.003,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "反思复核",
+                  "kind": "model",
+                  "elapsed_seconds": 1.739,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3090,
+                  "completion_tokens": 291,
+                  "status": "completed"
+                },
+                {
+                  "stage": "报告整理",
+                  "kind": "local",
+                  "elapsed_seconds": 0.001,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                }
+              ]
+            },
+            "created_at": "2026-10-23T04:13:43.493988+00:00"
+          }
+        },
+        "validation": {
+          "code_hash": "91e196b683206202cb16bcc63c9d3bac82072686d44d0e79f78a7294509b873f",
+          "status": "failed",
+          "checks": [
+            {
+              "id": "syntax",
+              "name": "syntax",
+              "status": "passed",
+              "detail": "Python AST 解析通过；未在宿主导入或执行代码。"
+            },
+            {
+              "id": "ruff",
+              "name": "ruff",
+              "status": "passed",
+              "detail": "配置的阻断静态规则通过。"
+            },
+            {
+              "id": "interface",
+              "name": "interface",
+              "status": "passed",
+              "detail": "要求 dependency_layers(dependencies) 函数。"
+            },
+            {
+              "id": "p1",
+              "name": "p1",
+              "status": "failed",
+              "detail": "实际返回 [['a', 'b']]",
+              "expected": "[['a'], ['b']]",
+              "actual": [
+                [
+                  "a",
+                  "b"
+                ]
+              ]
+            },
+            {
+              "id": "p2",
+              "name": "p2",
+              "status": "passed",
+              "detail": "实际返回 []",
+              "expected": "[]",
+              "actual": []
+            },
+            {
+              "id": "p3",
+              "name": "p3",
+              "status": "failed",
+              "detail": "实际返回 [['a']]",
+              "expected": "ValueError",
+              "actual": [
+                [
+                  "a"
+                ]
+              ]
+            },
+            {
+              "id": "p4",
+              "name": "p4",
+              "status": "failed",
+              "detail": "实际返回 [['z']]",
+              "expected": "[['a'], ['z']]",
+              "actual": [
+                [
+                  "z"
+                ]
+              ]
+            }
+          ],
+          "functional_executed": true,
+          "backend": "cpython-wasi",
+          "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+          "passed_count": 4,
+          "failed_count": 3
+        },
+        "extension_output": {},
+        "repair": []
+      },
+      "output": {
+        "source_version": "v1",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+        "acceptance_id": "av-layers-v1",
+        "fix_round": 1,
+        "next_node": "inspect",
+        "status": "running",
+        "termination_reason": "",
+        "review": {},
+        "validation": {},
+        "extension_output": {},
+        "repair": [
+          {
+            "base_code_hash": "91e196b683206202cb16bcc63c9d3bac82072686d44d0e79f78a7294509b873f",
+            "addressed_finding_ids": [
+              "F-1",
+              "F-2",
+              "F-3",
+              "V-p1",
+              "V-p3",
+              "V-p4",
+              "R-gap"
+            ],
+            "change_summary": "实现 Kahn 分层拓扑排序：收集 key 与 value 中所有任务为节点，前置去重后建边与入度；每轮取入度为 0 的剩余节点按字典序排序成批，移除后更新入度；若仍有剩余节点则抛 ValueError（覆盖自环与多分量循环）；不修改输入字典或列表，仅用标准库。",
+            "unresolved_items": [],
+            "round": 1,
+            "run_id": "b656bc16677242b684d49d188d986529"
+          }
+        ]
+      },
+      "usage": {
+        "model_calls": 1,
+        "prompt_tokens": 2102,
+        "completion_tokens": 431
+      }
+    },
+    {
+      "id": "9124be28ddff4d628349130e4c13a07f",
+      "node": "validate",
+      "started_at": "2026-10-23T04:22:29.247231+00:00",
+      "finished_at": "2026-10-23T04:22:31.457731+00:00",
+      "duration_seconds": 2.203,
+      "round": 1,
+      "status": "finished",
+      "error": "",
+      "input": {
+        "source_version": "v1",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+        "acceptance_id": "av-layers-v1",
+        "fix_round": 1,
+        "next_node": "inspect",
+        "status": "running",
+        "termination_reason": "",
+        "review": {},
+        "validation": {},
+        "extension_output": {}
+      },
+      "output": {
+        "source_version": "v1",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+        "acceptance_id": "av-layers-v1",
+        "fix_round": 1,
+        "next_node": "gate",
+        "status": "running",
+        "termination_reason": "",
+        "review": {},
+        "validation": {
+          "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+          "status": "passed",
+          "checks": [
+            {
+              "id": "syntax",
+              "name": "syntax",
+              "status": "passed",
+              "detail": "Python AST 解析通过；未在宿主导入或执行代码。"
+            },
+            {
+              "id": "ruff",
+              "name": "ruff",
+              "status": "passed",
+              "detail": "配置的阻断静态规则通过。"
+            },
+            {
+              "id": "interface",
+              "name": "interface",
+              "status": "passed",
+              "detail": "要求 dependency_layers(dependencies) 函数。"
+            },
+            {
+              "id": "p1",
+              "name": "p1",
+              "status": "passed",
+              "detail": "实际返回 [['a'], ['b']]",
+              "expected": "[['a'], ['b']]",
+              "actual": [
+                [
+                  "a"
+                ],
+                [
+                  "b"
+                ]
+              ]
+            },
+            {
+              "id": "p2",
+              "name": "p2",
+              "status": "passed",
+              "detail": "实际返回 []",
+              "expected": "[]",
+              "actual": []
+            },
+            {
+              "id": "p3",
+              "name": "p3",
+              "status": "passed",
+              "detail": "抛出 builtins.ValueError",
+              "expected": "ValueError",
+              "actual": null
+            },
+            {
+              "id": "p4",
+              "name": "p4",
+              "status": "passed",
+              "detail": "实际返回 [['a'], ['z']]",
+              "expected": "[['a'], ['z']]",
+              "actual": [
+                [
+                  "a"
+                ],
+                [
+                  "z"
+                ]
+              ]
+            }
+          ],
+          "functional_executed": true,
+          "backend": "cpython-wasi",
+          "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+          "passed_count": 7,
+          "failed_count": 0
+        },
+        "extension_output": {}
+      },
+      "usage": {
+        "model_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      },
+      "parallel": true
+    },
+    {
+      "id": "764644e6b3e5489990b0b3009e70ba8f",
+      "node": "review",
+      "started_at": "2026-10-23T04:22:29.246152+00:00",
+      "finished_at": "2026-10-23T04:22:35.867550+00:00",
+      "duration_seconds": 6.625,
+      "round": 1,
+      "status": "finished",
+      "error": "",
+      "input": {
+        "source_version": "v1",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+        "acceptance_id": "av-layers-v1",
+        "fix_round": 1,
+        "next_node": "inspect",
+        "status": "running",
+        "termination_reason": "",
+        "review": {},
+        "validation": {},
+        "extension_output": {}
+      },
+      "output": {
+        "source_version": "v1",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+        "acceptance_id": "av-layers-v1",
+        "fix_round": 1,
+        "next_node": "validate",
+        "status": "running",
+        "termination_reason": "",
+        "review": {
+          "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+          "complete": true,
+          "findings": [],
+          "pending_findings": [],
+          "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+          "requirements_status": "met",
+          "requirements_reason": "代码实现了 dependency_layers：收集所有任务（含仅作为前置出现的任务），用 set 去重前置，按字典序生成逐批可并行任务，空图返回 []，存在循环（含自环）时抛 ValueError 且不返回部分批次，未修改原字典或列表，仅用标准库。与任务要求一致。",
+          "report": {
+            "schema_version": 5,
+            "filename": "solution.py",
+            "language": "python",
+            "source_hash": "396e0f60ad43",
+            "mode": "deepseek",
+            "model": "deepseek-flash",
+            "strategy": "full",
+            "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+            "findings": [],
+            "pending_findings": [],
+            "verification_records": [],
+            "semantic_facts": [],
+            "calculations": [],
+            "limitations": [
+              "源码事实与静态规则有适用条件；未执行代码或测试，模型复核仍可能误报或漏报。",
+              "未执行代码或测试，结论基于静态阅读。",
+              "未验证输入类型异常（如 value 为 None 或非可迭代）时的行为，合同未要求。"
+            ],
+            "reflection_status": "skipped",
+            "checks": {
+              "Python 语法与结构": "completed",
+              "内置 AST 规则": "completed",
+              "Ruff 静态检查": "completed"
+            },
+            "events": [
+              {
+                "stage": "输入校验",
+                "detail": "solution.py · Python · 28 行 · 快照 396e0f60ad43"
+              },
+              {
+                "stage": "源码事实核对",
+                "detail": "提取 0 条计算/API 事实；未执行被审查代码。"
+              },
+              {
+                "stage": "工具规划",
+                "detail": "第 1 轮：可继续调用工具，也可直接输出报告 JSON。"
+              },
+              {
+                "stage": "工具执行",
+                "detail": "parse_structure · 结果已返回"
+              },
+              {
+                "stage": "工具执行",
+                "detail": "run_static_checks · 结果已返回"
+              },
+              {
+                "stage": "工具反馈与初审",
+                "detail": "第 2 轮：可继续调用工具，也可直接输出报告 JSON。"
+              },
+              {
+                "stage": "证据校验",
+                "detail": "0 条候选需复核（高/中优先级或证据链/工具背书检查）；普通低优先级意见仍可待确认。"
+              },
+              {
+                "stage": "报告完成",
+                "detail": "保留 0 条问题与建议，0 条待确认。"
+              }
+            ],
+            "metrics": {
+              "model_calls": 2,
+              "http_attempts": 2,
+              "tool_calls": 2,
+              "prompt_tokens": 7044,
+              "completion_tokens": 170,
+              "elapsed_seconds": 3.68,
+              "stages": [
+                {
+                  "stage": "源码事实核对",
+                  "kind": "local",
+                  "elapsed_seconds": 0.003,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "工具规划",
+                  "kind": "model",
+                  "elapsed_seconds": 1.915,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3473,
+                  "completion_tokens": 37,
+                  "status": "completed"
+                },
+                {
+                  "stage": "parse_structure",
+                  "kind": "tool",
+                  "elapsed_seconds": 0.001,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "run_static_checks",
+                  "kind": "tool",
+                  "elapsed_seconds": 0.214,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "工具反馈与初审",
+                  "kind": "model",
+                  "elapsed_seconds": 1.54,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3571,
+                  "completion_tokens": 133,
+                  "status": "completed"
+                },
+                {
+                  "stage": "证据校验",
+                  "kind": "local",
+                  "elapsed_seconds": 0.001,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "报告整理",
+                  "kind": "local",
+                  "elapsed_seconds": 0.0,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                }
+              ]
+            },
+            "created_at": "2026-10-23T04:22:34.629152+00:00"
+          }
+        },
+        "validation": {},
+        "extension_output": {}
+      },
+      "usage": {
+        "model_calls": 3,
+        "prompt_tokens": 7865,
+        "completion_tokens": 254
+      },
+      "parallel": true
+    },
+    {
+      "id": "3b673d4614104923a81dad67c6744810",
+      "node": "inspect",
+      "started_at": "2026-10-23T04:22:29.239599+00:00",
+      "finished_at": "2026-10-23T04:22:35.868553+00:00",
+      "duration_seconds": 6.64,
+      "round": 1,
+      "status": "running",
+      "error": "",
+      "input": {
+        "source_version": "v1",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+        "acceptance_id": "av-layers-v1",
+        "fix_round": 1,
+        "next_node": "inspect",
+        "status": "running",
+        "termination_reason": "",
+        "review": {},
+        "validation": {},
+        "extension_output": {}
+      },
+      "output": {
+        "source_version": "v1",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+        "acceptance_id": "av-layers-v1",
+        "fix_round": 1,
+        "next_node": "gate",
+        "status": "running",
+        "termination_reason": "",
+        "review": {
+          "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+          "complete": true,
+          "findings": [],
+          "pending_findings": [],
+          "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+          "requirements_status": "met",
+          "requirements_reason": "代码实现了 dependency_layers：收集所有任务（含仅作为前置出现的任务），用 set 去重前置，按字典序生成逐批可并行任务，空图返回 []，存在循环（含自环）时抛 ValueError 且不返回部分批次，未修改原字典或列表，仅用标准库。与任务要求一致。",
+          "report": {
+            "schema_version": 5,
+            "filename": "solution.py",
+            "language": "python",
+            "source_hash": "396e0f60ad43",
+            "mode": "deepseek",
+            "model": "deepseek-flash",
+            "strategy": "full",
+            "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+            "findings": [],
+            "pending_findings": [],
+            "verification_records": [],
+            "semantic_facts": [],
+            "calculations": [],
+            "limitations": [
+              "源码事实与静态规则有适用条件；未执行代码或测试，模型复核仍可能误报或漏报。",
+              "未执行代码或测试，结论基于静态阅读。",
+              "未验证输入类型异常（如 value 为 None 或非可迭代）时的行为，合同未要求。"
+            ],
+            "reflection_status": "skipped",
+            "checks": {
+              "Python 语法与结构": "completed",
+              "内置 AST 规则": "completed",
+              "Ruff 静态检查": "completed"
+            },
+            "events": [
+              {
+                "stage": "输入校验",
+                "detail": "solution.py · Python · 28 行 · 快照 396e0f60ad43"
+              },
+              {
+                "stage": "源码事实核对",
+                "detail": "提取 0 条计算/API 事实；未执行被审查代码。"
+              },
+              {
+                "stage": "工具规划",
+                "detail": "第 1 轮：可继续调用工具，也可直接输出报告 JSON。"
+              },
+              {
+                "stage": "工具执行",
+                "detail": "parse_structure · 结果已返回"
+              },
+              {
+                "stage": "工具执行",
+                "detail": "run_static_checks · 结果已返回"
+              },
+              {
+                "stage": "工具反馈与初审",
+                "detail": "第 2 轮：可继续调用工具，也可直接输出报告 JSON。"
+              },
+              {
+                "stage": "证据校验",
+                "detail": "0 条候选需复核（高/中优先级或证据链/工具背书检查）；普通低优先级意见仍可待确认。"
+              },
+              {
+                "stage": "报告完成",
+                "detail": "保留 0 条问题与建议，0 条待确认。"
+              }
+            ],
+            "metrics": {
+              "model_calls": 2,
+              "http_attempts": 2,
+              "tool_calls": 2,
+              "prompt_tokens": 7044,
+              "completion_tokens": 170,
+              "elapsed_seconds": 3.68,
+              "stages": [
+                {
+                  "stage": "源码事实核对",
+                  "kind": "local",
+                  "elapsed_seconds": 0.003,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "工具规划",
+                  "kind": "model",
+                  "elapsed_seconds": 1.915,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3473,
+                  "completion_tokens": 37,
+                  "status": "completed"
+                },
+                {
+                  "stage": "parse_structure",
+                  "kind": "tool",
+                  "elapsed_seconds": 0.001,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "run_static_checks",
+                  "kind": "tool",
+                  "elapsed_seconds": 0.214,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "工具反馈与初审",
+                  "kind": "model",
+                  "elapsed_seconds": 1.54,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3571,
+                  "completion_tokens": 133,
+                  "status": "completed"
+                },
+                {
+                  "stage": "证据校验",
+                  "kind": "local",
+                  "elapsed_seconds": 0.001,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "报告整理",
+                  "kind": "local",
+                  "elapsed_seconds": 0.0,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                }
+              ]
+            },
+            "created_at": "2026-10-23T04:22:34.629152+00:00"
+          }
+        },
+        "validation": {
+          "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+          "status": "passed",
+          "checks": [
+            {
+              "id": "syntax",
+              "name": "syntax",
+              "status": "passed",
+              "detail": "Python AST 解析通过；未在宿主导入或执行代码。"
+            },
+            {
+              "id": "ruff",
+              "name": "ruff",
+              "status": "passed",
+              "detail": "配置的阻断静态规则通过。"
+            },
+            {
+              "id": "interface",
+              "name": "interface",
+              "status": "passed",
+              "detail": "要求 dependency_layers(dependencies) 函数。"
+            },
+            {
+              "id": "p1",
+              "name": "p1",
+              "status": "passed",
+              "detail": "实际返回 [['a'], ['b']]",
+              "expected": "[['a'], ['b']]",
+              "actual": [
+                [
+                  "a"
+                ],
+                [
+                  "b"
+                ]
+              ]
+            },
+            {
+              "id": "p2",
+              "name": "p2",
+              "status": "passed",
+              "detail": "实际返回 []",
+              "expected": "[]",
+              "actual": []
+            },
+            {
+              "id": "p3",
+              "name": "p3",
+              "status": "passed",
+              "detail": "抛出 builtins.ValueError",
+              "expected": "ValueError",
+              "actual": null
+            },
+            {
+              "id": "p4",
+              "name": "p4",
+              "status": "passed",
+              "detail": "实际返回 [['a'], ['z']]",
+              "expected": "[['a'], ['z']]",
+              "actual": [
+                [
+                  "a"
+                ],
+                [
+                  "z"
+                ]
+              ]
+            }
+          ],
+          "functional_executed": true,
+          "backend": "cpython-wasi",
+          "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+          "passed_count": 7,
+          "failed_count": 0
+        },
+        "extension_output": {}
+      },
+      "usage": {
+        "model_calls": 3,
+        "prompt_tokens": 7865,
+        "completion_tokens": 254
+      }
+    },
+    {
+      "id": "635fa6b87d9942ad84f6826fe1a82b95",
+      "node": "gate",
+      "started_at": "2026-10-23T04:22:35.879463+00:00",
+      "finished_at": "2026-10-23T04:22:35.879463+00:00",
+      "duration_seconds": 0.0,
+      "round": 1,
+      "status": "completed_verified",
+      "error": "",
+      "input": {
+        "source_version": "v1",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+        "acceptance_id": "av-layers-v1",
+        "fix_round": 1,
+        "next_node": "gate",
+        "status": "running",
+        "termination_reason": "",
+        "review": {
+          "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+          "complete": true,
+          "findings": [],
+          "pending_findings": [],
+          "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+          "requirements_status": "met",
+          "requirements_reason": "代码实现了 dependency_layers：收集所有任务（含仅作为前置出现的任务），用 set 去重前置，按字典序生成逐批可并行任务，空图返回 []，存在循环（含自环）时抛 ValueError 且不返回部分批次，未修改原字典或列表，仅用标准库。与任务要求一致。",
+          "report": {
+            "schema_version": 5,
+            "filename": "solution.py",
+            "language": "python",
+            "source_hash": "396e0f60ad43",
+            "mode": "deepseek",
+            "model": "deepseek-flash",
+            "strategy": "full",
+            "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+            "findings": [],
+            "pending_findings": [],
+            "verification_records": [],
+            "semantic_facts": [],
+            "calculations": [],
+            "limitations": [
+              "源码事实与静态规则有适用条件；未执行代码或测试，模型复核仍可能误报或漏报。",
+              "未执行代码或测试，结论基于静态阅读。",
+              "未验证输入类型异常（如 value 为 None 或非可迭代）时的行为，合同未要求。"
+            ],
+            "reflection_status": "skipped",
+            "checks": {
+              "Python 语法与结构": "completed",
+              "内置 AST 规则": "completed",
+              "Ruff 静态检查": "completed"
+            },
+            "events": [
+              {
+                "stage": "输入校验",
+                "detail": "solution.py · Python · 28 行 · 快照 396e0f60ad43"
+              },
+              {
+                "stage": "源码事实核对",
+                "detail": "提取 0 条计算/API 事实；未执行被审查代码。"
+              },
+              {
+                "stage": "工具规划",
+                "detail": "第 1 轮：可继续调用工具，也可直接输出报告 JSON。"
+              },
+              {
+                "stage": "工具执行",
+                "detail": "parse_structure · 结果已返回"
+              },
+              {
+                "stage": "工具执行",
+                "detail": "run_static_checks · 结果已返回"
+              },
+              {
+                "stage": "工具反馈与初审",
+                "detail": "第 2 轮：可继续调用工具，也可直接输出报告 JSON。"
+              },
+              {
+                "stage": "证据校验",
+                "detail": "0 条候选需复核（高/中优先级或证据链/工具背书检查）；普通低优先级意见仍可待确认。"
+              },
+              {
+                "stage": "报告完成",
+                "detail": "保留 0 条问题与建议，0 条待确认。"
+              }
+            ],
+            "metrics": {
+              "model_calls": 2,
+              "http_attempts": 2,
+              "tool_calls": 2,
+              "prompt_tokens": 7044,
+              "completion_tokens": 170,
+              "elapsed_seconds": 3.68,
+              "stages": [
+                {
+                  "stage": "源码事实核对",
+                  "kind": "local",
+                  "elapsed_seconds": 0.003,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "工具规划",
+                  "kind": "model",
+                  "elapsed_seconds": 1.915,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3473,
+                  "completion_tokens": 37,
+                  "status": "completed"
+                },
+                {
+                  "stage": "parse_structure",
+                  "kind": "tool",
+                  "elapsed_seconds": 0.001,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "run_static_checks",
+                  "kind": "tool",
+                  "elapsed_seconds": 0.214,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "工具反馈与初审",
+                  "kind": "model",
+                  "elapsed_seconds": 1.54,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3571,
+                  "completion_tokens": 133,
+                  "status": "completed"
+                },
+                {
+                  "stage": "证据校验",
+                  "kind": "local",
+                  "elapsed_seconds": 0.001,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "报告整理",
+                  "kind": "local",
+                  "elapsed_seconds": 0.0,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                }
+              ]
+            },
+            "created_at": "2026-10-23T04:22:34.629152+00:00"
+          }
+        },
+        "validation": {
+          "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+          "status": "passed",
+          "checks": [
+            {
+              "id": "syntax",
+              "name": "syntax",
+              "status": "passed",
+              "detail": "Python AST 解析通过；未在宿主导入或执行代码。"
+            },
+            {
+              "id": "ruff",
+              "name": "ruff",
+              "status": "passed",
+              "detail": "配置的阻断静态规则通过。"
+            },
+            {
+              "id": "interface",
+              "name": "interface",
+              "status": "passed",
+              "detail": "要求 dependency_layers(dependencies) 函数。"
+            },
+            {
+              "id": "p1",
+              "name": "p1",
+              "status": "passed",
+              "detail": "实际返回 [['a'], ['b']]",
+              "expected": "[['a'], ['b']]",
+              "actual": [
+                [
+                  "a"
+                ],
+                [
+                  "b"
+                ]
+              ]
+            },
+            {
+              "id": "p2",
+              "name": "p2",
+              "status": "passed",
+              "detail": "实际返回 []",
+              "expected": "[]",
+              "actual": []
+            },
+            {
+              "id": "p3",
+              "name": "p3",
+              "status": "passed",
+              "detail": "抛出 builtins.ValueError",
+              "expected": "ValueError",
+              "actual": null
+            },
+            {
+              "id": "p4",
+              "name": "p4",
+              "status": "passed",
+              "detail": "实际返回 [['a'], ['z']]",
+              "expected": "[['a'], ['z']]",
+              "actual": [
+                [
+                  "a"
+                ],
+                [
+                  "z"
+                ]
+              ]
+            }
+          ],
+          "functional_executed": true,
+          "backend": "cpython-wasi",
+          "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+          "passed_count": 7,
+          "failed_count": 0
+        },
+        "extension_output": {}
+      },
+      "output": {
+        "source_version": "v1",
+        "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+        "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+        "acceptance_id": "av-layers-v1",
+        "fix_round": 1,
+        "next_node": "gate",
+        "status": "completed_verified",
+        "termination_reason": "frozen_acceptance_passed",
+        "review": {
+          "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+          "complete": true,
+          "findings": [],
+          "pending_findings": [],
+          "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+          "requirements_status": "met",
+          "requirements_reason": "代码实现了 dependency_layers：收集所有任务（含仅作为前置出现的任务），用 set 去重前置，按字典序生成逐批可并行任务，空图返回 []，存在循环（含自环）时抛 ValueError 且不返回部分批次，未修改原字典或列表，仅用标准库。与任务要求一致。",
+          "report": {
+            "schema_version": 5,
+            "filename": "solution.py",
+            "language": "python",
+            "source_hash": "396e0f60ad43",
+            "mode": "deepseek",
+            "model": "deepseek-flash",
+            "strategy": "full",
+            "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+            "findings": [],
+            "pending_findings": [],
+            "verification_records": [],
+            "semantic_facts": [],
+            "calculations": [],
+            "limitations": [
+              "源码事实与静态规则有适用条件；未执行代码或测试，模型复核仍可能误报或漏报。",
+              "未执行代码或测试，结论基于静态阅读。",
+              "未验证输入类型异常（如 value 为 None 或非可迭代）时的行为，合同未要求。"
+            ],
+            "reflection_status": "skipped",
+            "checks": {
+              "Python 语法与结构": "completed",
+              "内置 AST 规则": "completed",
+              "Ruff 静态检查": "completed"
+            },
+            "events": [
+              {
+                "stage": "输入校验",
+                "detail": "solution.py · Python · 28 行 · 快照 396e0f60ad43"
+              },
+              {
+                "stage": "源码事实核对",
+                "detail": "提取 0 条计算/API 事实；未执行被审查代码。"
+              },
+              {
+                "stage": "工具规划",
+                "detail": "第 1 轮：可继续调用工具，也可直接输出报告 JSON。"
+              },
+              {
+                "stage": "工具执行",
+                "detail": "parse_structure · 结果已返回"
+              },
+              {
+                "stage": "工具执行",
+                "detail": "run_static_checks · 结果已返回"
+              },
+              {
+                "stage": "工具反馈与初审",
+                "detail": "第 2 轮：可继续调用工具，也可直接输出报告 JSON。"
+              },
+              {
+                "stage": "证据校验",
+                "detail": "0 条候选需复核（高/中优先级或证据链/工具背书检查）；普通低优先级意见仍可待确认。"
+              },
+              {
+                "stage": "报告完成",
+                "detail": "保留 0 条问题与建议，0 条待确认。"
+              }
+            ],
+            "metrics": {
+              "model_calls": 2,
+              "http_attempts": 2,
+              "tool_calls": 2,
+              "prompt_tokens": 7044,
+              "completion_tokens": 170,
+              "elapsed_seconds": 3.68,
+              "stages": [
+                {
+                  "stage": "源码事实核对",
+                  "kind": "local",
+                  "elapsed_seconds": 0.003,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "工具规划",
+                  "kind": "model",
+                  "elapsed_seconds": 1.915,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3473,
+                  "completion_tokens": 37,
+                  "status": "completed"
+                },
+                {
+                  "stage": "parse_structure",
+                  "kind": "tool",
+                  "elapsed_seconds": 0.001,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "run_static_checks",
+                  "kind": "tool",
+                  "elapsed_seconds": 0.214,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "工具反馈与初审",
+                  "kind": "model",
+                  "elapsed_seconds": 1.54,
+                  "model_calls": 1,
+                  "http_attempts": 1,
+                  "prompt_tokens": 3571,
+                  "completion_tokens": 133,
+                  "status": "completed"
+                },
+                {
+                  "stage": "证据校验",
+                  "kind": "local",
+                  "elapsed_seconds": 0.001,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                },
+                {
+                  "stage": "报告整理",
+                  "kind": "local",
+                  "elapsed_seconds": 0.0,
+                  "model_calls": 0,
+                  "http_attempts": 0,
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "status": "completed"
+                }
+              ]
+            },
+            "created_at": "2026-10-23T04:22:34.629152+00:00"
+          }
+        },
+        "validation": {
+          "code_hash": "396e0f60ad43399796476dba611ad350a8add0f384cf880d8c9a65756531e9c5",
+          "status": "passed",
+          "checks": [
+            {
+              "id": "syntax",
+              "name": "syntax",
+              "status": "passed",
+              "detail": "Python AST 解析通过；未在宿主导入或执行代码。"
+            },
+            {
+              "id": "ruff",
+              "name": "ruff",
+              "status": "passed",
+              "detail": "配置的阻断静态规则通过。"
+            },
+            {
+              "id": "interface",
+              "name": "interface",
+              "status": "passed",
+              "detail": "要求 dependency_layers(dependencies) 函数。"
+            },
+            {
+              "id": "p1",
+              "name": "p1",
+              "status": "passed",
+              "detail": "实际返回 [['a'], ['b']]",
+              "expected": "[['a'], ['b']]",
+              "actual": [
+                [
+                  "a"
+                ],
+                [
+                  "b"
+                ]
+              ]
+            },
+            {
+              "id": "p2",
+              "name": "p2",
+              "status": "passed",
+              "detail": "实际返回 []",
+              "expected": "[]",
+              "actual": []
+            },
+            {
+              "id": "p3",
+              "name": "p3",
+              "status": "passed",
+              "detail": "抛出 builtins.ValueError",
+              "expected": "ValueError",
+              "actual": null
+            },
+            {
+              "id": "p4",
+              "name": "p4",
+              "status": "passed",
+              "detail": "实际返回 [['a'], ['z']]",
+              "expected": "[['a'], ['z']]",
+              "actual": [
+                [
+                  "a"
+                ],
+                [
+                  "z"
+                ]
+              ]
+            }
+          ],
+          "functional_executed": true,
+          "backend": "cpython-wasi",
+          "runtime_sha256": "67e1c32a85d5e0600c0939f5fd4023ca0127f1a9e81f5499697467bda67af78d",
+          "passed_count": 7,
+          "failed_count": 0
+        },
+        "extension_output": {}
+      },
+      "usage": {
+        "model_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    }
+  ],
+  "extra_usage": {
+    "calls": 4,
+    "actual_tokens": 10652,
+    "charged_tokens": 10652
+  },
+  "combined_usage": {
+    "calls": 129,
+    "actual_tokens": 351372,
+    "charged_tokens": 368748
+  }
+}

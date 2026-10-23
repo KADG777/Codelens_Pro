@@ -12,6 +12,12 @@ from ui.diff_view import build_side_by_side_html
 
 
 def render_comparison(root: Path):
+    if (root / "evals/results/agent-value-live.json").exists():
+        from ui.agent_value_view import render_agent_value
+        choice = st.radio("实验报告", ["三组重复实验", "首轮两组实验（保留）"], horizontal=True, key="comparison_report")
+        if choice == "三组重复实验":
+            render_agent_value(root)
+            return
     path = root / "evals/results/paired-live.json"
     st.subheader("同任务：直接处理与完整工作流")
     if not path.is_file():

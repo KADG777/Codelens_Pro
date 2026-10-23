@@ -1,0 +1,1058 @@
+{
+  "kind": "fault_injection_recovery",
+  "real_api_used": false,
+  "created_at": "2026-10-23T04:16:58.973459+00:00",
+  "checks": {
+    "paused_on_failure": true,
+    "continued_after_process_reopen": true,
+    "successful_review_not_repeated": true,
+    "same_source_retried": true,
+    "no_model_api_calls": true
+  },
+  "passed": true,
+  "run_id": "a217fdc331f34b7d91c75a4d6b9219c7",
+  "canvas_hash": "f3ae4a83f9efbab96f37235572589340bd9d6267aab28c871a6a4dca2b659818",
+  "before": {
+    "status": "blocked",
+    "completed_nodes": {
+      "coding": "done",
+      "review": "done"
+    }
+  },
+  "after": {
+    "status": "completed_static",
+    "metrics": {
+      "model_calls": 0,
+      "http_attempts": 0,
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "tool_calls": 3,
+      "active_seconds": 0.39,
+      "scripted_actions": 1
+    },
+    "node_runs": [
+      {
+        "id": "f20784c4a50f4a3a9086abd701ec97aa",
+        "node": "coding",
+        "started_at": "2026-10-23T04:16:58.512594+00:00",
+        "finished_at": "2026-10-23T04:16:58.512594+00:00",
+        "duration_seconds": 0.0,
+        "round": 0,
+        "status": "running",
+        "error": "",
+        "input": {
+          "source_version": null,
+          "code_hash": null,
+          "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+          "acceptance_id": "orders-v1",
+          "fix_round": 0,
+          "next_node": "canvas",
+          "status": "running",
+          "termination_reason": "",
+          "review": {},
+          "validation": {},
+          "extension_output": {}
+        },
+        "output": {
+          "source_version": "v0",
+          "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+          "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+          "acceptance_id": "orders-v1",
+          "fix_round": 0,
+          "next_node": "canvas",
+          "status": "running",
+          "termination_reason": "",
+          "review": {},
+          "validation": {},
+          "extension_output": {},
+          "next_nodes": [
+            "review",
+            "validate"
+          ]
+        },
+        "usage": {
+          "model_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0
+        },
+        "parallel": false
+      },
+      {
+        "id": "1bf261c428b3446e953dbb6d64704826",
+        "node": "review",
+        "started_at": "2026-10-23T04:16:58.516180+00:00",
+        "finished_at": "2026-10-23T04:16:58.705822+00:00",
+        "duration_seconds": 0.187,
+        "round": 0,
+        "status": "running",
+        "error": "",
+        "input": {
+          "source_version": "v0",
+          "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+          "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+          "acceptance_id": "orders-v1",
+          "fix_round": 0,
+          "next_node": "canvas",
+          "status": "running",
+          "termination_reason": "",
+          "review": {},
+          "validation": {},
+          "extension_output": {}
+        },
+        "output": {
+          "source_version": "v0",
+          "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+          "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+          "acceptance_id": "orders-v1",
+          "fix_round": 0,
+          "next_node": "canvas",
+          "status": "running",
+          "termination_reason": "",
+          "review": {
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "complete": true,
+            "findings": [],
+            "pending_findings": [],
+            "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+            "requirements_status": "not_evaluated",
+            "requirements_reason": "离线规则不判断通用需求语义。",
+            "report": {
+              "schema_version": 5,
+              "filename": "solution.py",
+              "language": "python",
+              "source_hash": "81f3251c8e3d",
+              "mode": "demo",
+              "model": "本地规则演示",
+              "strategy": "full",
+              "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+              "findings": [],
+              "pending_findings": [],
+              "verification_records": [],
+              "semantic_facts": [],
+              "calculations": [],
+              "limitations": [
+                "源码事实与静态规则有适用条件；未执行代码或测试，模型复核仍可能误报或漏报。",
+                "离线演示只覆盖本地规则，未进行模型语义分析。"
+              ],
+              "reflection_status": "local_only",
+              "checks": {
+                "Python 语法与结构": "completed",
+                "内置 AST 规则": "completed",
+                "Ruff 静态检查": "completed"
+              },
+              "events": [
+                {
+                  "stage": "输入校验",
+                  "detail": "solution.py · Python · 16 行 · 快照 81f3251c8e3d"
+                },
+                {
+                  "stage": "源码事实核对",
+                  "detail": "提取 0 条计算/API 事实；未执行被审查代码。"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "read_source · 结果已返回"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "parse_structure · 结果已返回"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "run_static_checks · 结果已返回"
+                },
+                {
+                  "stage": "证据校验",
+                  "detail": "0 条候选需复核（高/中优先级或证据链/工具背书检查）；普通低优先级意见仍可待确认。"
+                },
+                {
+                  "stage": "报告完成",
+                  "detail": "保留 0 条问题与建议，0 条待确认。"
+                }
+              ],
+              "metrics": {
+                "model_calls": 0,
+                "http_attempts": 0,
+                "tool_calls": 3,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "elapsed_seconds": 0.19,
+                "stages": [
+                  {
+                    "stage": "源码事实核对",
+                    "kind": "local",
+                    "elapsed_seconds": 0.001,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "read_source",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "parse_structure",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "run_static_checks",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.186,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "证据校验",
+                    "kind": "local",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "报告整理",
+                    "kind": "local",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  }
+                ]
+              },
+              "created_at": "2026-10-23T04:16:58.705822+00:00"
+            }
+          },
+          "validation": {},
+          "extension_output": {},
+          "next_nodes": [
+            "gate"
+          ]
+        },
+        "usage": {
+          "model_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0
+        },
+        "parallel": true
+      },
+      {
+        "id": "b16b4f6cccee48da91aca714ee002127",
+        "node": "validate",
+        "started_at": "2026-10-23T04:16:58.519270+00:00",
+        "finished_at": "2026-10-23T04:16:58.519270+00:00",
+        "duration_seconds": 0.0,
+        "round": 0,
+        "status": "blocked",
+        "error": "Injected one-time validator outage",
+        "input": {
+          "source_version": "v0",
+          "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+          "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+          "acceptance_id": "orders-v1",
+          "fix_round": 0,
+          "next_node": "canvas",
+          "status": "running",
+          "termination_reason": "",
+          "review": {},
+          "validation": {},
+          "extension_output": {}
+        },
+        "output": {
+          "source_version": "v0",
+          "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+          "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+          "acceptance_id": "orders-v1",
+          "fix_round": 0,
+          "next_node": "canvas",
+          "status": "blocked",
+          "termination_reason": "validation_environment",
+          "review": {},
+          "validation": {
+            "status": "error",
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "functional_executed": false,
+            "failed_count": 0,
+            "passed_count": 0,
+            "checks": [
+              {
+                "id": "injected_failure",
+                "status": "error",
+                "detail": "Injected one-time validator outage"
+              }
+            ]
+          },
+          "extension_output": {},
+          "next_nodes": []
+        },
+        "usage": {
+          "model_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0
+        },
+        "parallel": true
+      },
+      {
+        "id": "b4a44573d4da446e8f8d0baaea099b66",
+        "node": "validate",
+        "started_at": "2026-10-23T04:16:58.748818+00:00",
+        "finished_at": "2026-10-23T04:16:58.954064+00:00",
+        "duration_seconds": 0.203,
+        "round": 0,
+        "status": "running",
+        "error": "",
+        "input": {
+          "source_version": "v0",
+          "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+          "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+          "acceptance_id": "orders-v1",
+          "fix_round": 0,
+          "next_node": "canvas",
+          "status": "running",
+          "termination_reason": "",
+          "review": {
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "complete": true,
+            "findings": [],
+            "pending_findings": [],
+            "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+            "requirements_status": "not_evaluated",
+            "requirements_reason": "离线规则不判断通用需求语义。",
+            "report": {
+              "schema_version": 5,
+              "filename": "solution.py",
+              "language": "python",
+              "source_hash": "81f3251c8e3d",
+              "mode": "demo",
+              "model": "本地规则演示",
+              "strategy": "full",
+              "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+              "findings": [],
+              "pending_findings": [],
+              "verification_records": [],
+              "semantic_facts": [],
+              "calculations": [],
+              "limitations": [
+                "源码事实与静态规则有适用条件；未执行代码或测试，模型复核仍可能误报或漏报。",
+                "离线演示只覆盖本地规则，未进行模型语义分析。"
+              ],
+              "reflection_status": "local_only",
+              "checks": {
+                "Python 语法与结构": "completed",
+                "内置 AST 规则": "completed",
+                "Ruff 静态检查": "completed"
+              },
+              "events": [
+                {
+                  "stage": "输入校验",
+                  "detail": "solution.py · Python · 16 行 · 快照 81f3251c8e3d"
+                },
+                {
+                  "stage": "源码事实核对",
+                  "detail": "提取 0 条计算/API 事实；未执行被审查代码。"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "read_source · 结果已返回"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "parse_structure · 结果已返回"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "run_static_checks · 结果已返回"
+                },
+                {
+                  "stage": "证据校验",
+                  "detail": "0 条候选需复核（高/中优先级或证据链/工具背书检查）；普通低优先级意见仍可待确认。"
+                },
+                {
+                  "stage": "报告完成",
+                  "detail": "保留 0 条问题与建议，0 条待确认。"
+                }
+              ],
+              "metrics": {
+                "model_calls": 0,
+                "http_attempts": 0,
+                "tool_calls": 3,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "elapsed_seconds": 0.19,
+                "stages": [
+                  {
+                    "stage": "源码事实核对",
+                    "kind": "local",
+                    "elapsed_seconds": 0.001,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "read_source",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "parse_structure",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "run_static_checks",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.186,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "证据校验",
+                    "kind": "local",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "报告整理",
+                    "kind": "local",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  }
+                ]
+              },
+              "created_at": "2026-10-23T04:16:58.705822+00:00"
+            }
+          },
+          "validation": {
+            "status": "error",
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "functional_executed": false,
+            "failed_count": 0,
+            "passed_count": 0,
+            "checks": [
+              {
+                "id": "injected_failure",
+                "status": "error",
+                "detail": "Injected one-time validator outage"
+              }
+            ]
+          },
+          "extension_output": {}
+        },
+        "output": {
+          "source_version": "v0",
+          "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+          "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+          "acceptance_id": "orders-v1",
+          "fix_round": 0,
+          "next_node": "canvas",
+          "status": "running",
+          "termination_reason": "",
+          "review": {
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "complete": true,
+            "findings": [],
+            "pending_findings": [],
+            "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+            "requirements_status": "not_evaluated",
+            "requirements_reason": "离线规则不判断通用需求语义。",
+            "report": {
+              "schema_version": 5,
+              "filename": "solution.py",
+              "language": "python",
+              "source_hash": "81f3251c8e3d",
+              "mode": "demo",
+              "model": "本地规则演示",
+              "strategy": "full",
+              "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+              "findings": [],
+              "pending_findings": [],
+              "verification_records": [],
+              "semantic_facts": [],
+              "calculations": [],
+              "limitations": [
+                "源码事实与静态规则有适用条件；未执行代码或测试，模型复核仍可能误报或漏报。",
+                "离线演示只覆盖本地规则，未进行模型语义分析。"
+              ],
+              "reflection_status": "local_only",
+              "checks": {
+                "Python 语法与结构": "completed",
+                "内置 AST 规则": "completed",
+                "Ruff 静态检查": "completed"
+              },
+              "events": [
+                {
+                  "stage": "输入校验",
+                  "detail": "solution.py · Python · 16 行 · 快照 81f3251c8e3d"
+                },
+                {
+                  "stage": "源码事实核对",
+                  "detail": "提取 0 条计算/API 事实；未执行被审查代码。"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "read_source · 结果已返回"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "parse_structure · 结果已返回"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "run_static_checks · 结果已返回"
+                },
+                {
+                  "stage": "证据校验",
+                  "detail": "0 条候选需复核（高/中优先级或证据链/工具背书检查）；普通低优先级意见仍可待确认。"
+                },
+                {
+                  "stage": "报告完成",
+                  "detail": "保留 0 条问题与建议，0 条待确认。"
+                }
+              ],
+              "metrics": {
+                "model_calls": 0,
+                "http_attempts": 0,
+                "tool_calls": 3,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "elapsed_seconds": 0.19,
+                "stages": [
+                  {
+                    "stage": "源码事实核对",
+                    "kind": "local",
+                    "elapsed_seconds": 0.001,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "read_source",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "parse_structure",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "run_static_checks",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.186,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "证据校验",
+                    "kind": "local",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "报告整理",
+                    "kind": "local",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  }
+                ]
+              },
+              "created_at": "2026-10-23T04:16:58.705822+00:00"
+            }
+          },
+          "validation": {
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "status": "passed",
+            "checks": [
+              {
+                "id": "syntax",
+                "name": "syntax",
+                "status": "passed",
+                "detail": "Python AST 解析通过；未在宿主导入或执行代码。"
+              },
+              {
+                "id": "ruff",
+                "name": "ruff",
+                "status": "passed",
+                "detail": "配置的阻断静态规则通过。"
+              },
+              {
+                "id": "interface",
+                "name": "interface",
+                "status": "passed",
+                "detail": "要求 summarize_orders(orders) 函数。"
+              },
+              {
+                "id": "functional",
+                "name": "functional",
+                "status": "skipped",
+                "detail": "static_only：未执行功能测试。"
+              }
+            ],
+            "functional_executed": false,
+            "backend": "",
+            "runtime_sha256": "",
+            "passed_count": 3,
+            "failed_count": 0
+          },
+          "extension_output": {},
+          "next_nodes": [
+            "gate"
+          ]
+        },
+        "usage": {
+          "model_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0
+        },
+        "parallel": false
+      },
+      {
+        "id": "f8e1f4ad1a4040f49adbe884d44a35f4",
+        "node": "gate",
+        "started_at": "2026-10-23T04:16:58.958308+00:00",
+        "finished_at": "2026-10-23T04:16:58.958308+00:00",
+        "duration_seconds": 0.0,
+        "round": 0,
+        "status": "completed_static",
+        "error": "",
+        "input": {
+          "source_version": "v0",
+          "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+          "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+          "acceptance_id": "orders-v1",
+          "fix_round": 0,
+          "next_node": "canvas",
+          "status": "running",
+          "termination_reason": "",
+          "review": {
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "complete": true,
+            "findings": [],
+            "pending_findings": [],
+            "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+            "requirements_status": "not_evaluated",
+            "requirements_reason": "离线规则不判断通用需求语义。",
+            "report": {
+              "schema_version": 5,
+              "filename": "solution.py",
+              "language": "python",
+              "source_hash": "81f3251c8e3d",
+              "mode": "demo",
+              "model": "本地规则演示",
+              "strategy": "full",
+              "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+              "findings": [],
+              "pending_findings": [],
+              "verification_records": [],
+              "semantic_facts": [],
+              "calculations": [],
+              "limitations": [
+                "源码事实与静态规则有适用条件；未执行代码或测试，模型复核仍可能误报或漏报。",
+                "离线演示只覆盖本地规则，未进行模型语义分析。"
+              ],
+              "reflection_status": "local_only",
+              "checks": {
+                "Python 语法与结构": "completed",
+                "内置 AST 规则": "completed",
+                "Ruff 静态检查": "completed"
+              },
+              "events": [
+                {
+                  "stage": "输入校验",
+                  "detail": "solution.py · Python · 16 行 · 快照 81f3251c8e3d"
+                },
+                {
+                  "stage": "源码事实核对",
+                  "detail": "提取 0 条计算/API 事实；未执行被审查代码。"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "read_source · 结果已返回"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "parse_structure · 结果已返回"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "run_static_checks · 结果已返回"
+                },
+                {
+                  "stage": "证据校验",
+                  "detail": "0 条候选需复核（高/中优先级或证据链/工具背书检查）；普通低优先级意见仍可待确认。"
+                },
+                {
+                  "stage": "报告完成",
+                  "detail": "保留 0 条问题与建议，0 条待确认。"
+                }
+              ],
+              "metrics": {
+                "model_calls": 0,
+                "http_attempts": 0,
+                "tool_calls": 3,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "elapsed_seconds": 0.19,
+                "stages": [
+                  {
+                    "stage": "源码事实核对",
+                    "kind": "local",
+                    "elapsed_seconds": 0.001,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "read_source",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "parse_structure",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "run_static_checks",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.186,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "证据校验",
+                    "kind": "local",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "报告整理",
+                    "kind": "local",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  }
+                ]
+              },
+              "created_at": "2026-10-23T04:16:58.705822+00:00"
+            }
+          },
+          "validation": {
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "status": "passed",
+            "checks": [
+              {
+                "id": "syntax",
+                "name": "syntax",
+                "status": "passed",
+                "detail": "Python AST 解析通过；未在宿主导入或执行代码。"
+              },
+              {
+                "id": "ruff",
+                "name": "ruff",
+                "status": "passed",
+                "detail": "配置的阻断静态规则通过。"
+              },
+              {
+                "id": "interface",
+                "name": "interface",
+                "status": "passed",
+                "detail": "要求 summarize_orders(orders) 函数。"
+              },
+              {
+                "id": "functional",
+                "name": "functional",
+                "status": "skipped",
+                "detail": "static_only：未执行功能测试。"
+              }
+            ],
+            "functional_executed": false,
+            "backend": "",
+            "runtime_sha256": "",
+            "passed_count": 3,
+            "failed_count": 0
+          },
+          "extension_output": {}
+        },
+        "output": {
+          "source_version": "v0",
+          "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+          "task": "实现 Python 函数 summarize_orders(orders)。输入是订单列表，每项有整数 amount_cents 和布尔 paid。\n返回字典 paid_count 和 total_cents，只统计已付款订单。空列表返回两个 0，不修改输入。\n所有订单都必须校验：缺少字段、金额不是非负整数（bool 不算整数）、paid 不是布尔值时抛出 ValueError。\n只使用标准库，保留 summarize_orders(orders) 接口。",
+          "acceptance_id": "orders-v1",
+          "fix_round": 0,
+          "next_node": "canvas",
+          "status": "completed_static",
+          "termination_reason": "static_only_functionality_unverified",
+          "review": {
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "complete": true,
+            "findings": [],
+            "pending_findings": [],
+            "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+            "requirements_status": "not_evaluated",
+            "requirements_reason": "离线规则不判断通用需求语义。",
+            "report": {
+              "schema_version": 5,
+              "filename": "solution.py",
+              "language": "python",
+              "source_hash": "81f3251c8e3d",
+              "mode": "demo",
+              "model": "本地规则演示",
+              "strategy": "full",
+              "summary": "本次保留 0 条问题与建议（静态规则命中 0 条，模型复核支持 0 条），另有 0 条待确认。源码引用及工具来源已检查；未执行被审查代码，结论仍需结合实际测试。",
+              "findings": [],
+              "pending_findings": [],
+              "verification_records": [],
+              "semantic_facts": [],
+              "calculations": [],
+              "limitations": [
+                "源码事实与静态规则有适用条件；未执行代码或测试，模型复核仍可能误报或漏报。",
+                "离线演示只覆盖本地规则，未进行模型语义分析。"
+              ],
+              "reflection_status": "local_only",
+              "checks": {
+                "Python 语法与结构": "completed",
+                "内置 AST 规则": "completed",
+                "Ruff 静态检查": "completed"
+              },
+              "events": [
+                {
+                  "stage": "输入校验",
+                  "detail": "solution.py · Python · 16 行 · 快照 81f3251c8e3d"
+                },
+                {
+                  "stage": "源码事实核对",
+                  "detail": "提取 0 条计算/API 事实；未执行被审查代码。"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "read_source · 结果已返回"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "parse_structure · 结果已返回"
+                },
+                {
+                  "stage": "工具执行",
+                  "detail": "run_static_checks · 结果已返回"
+                },
+                {
+                  "stage": "证据校验",
+                  "detail": "0 条候选需复核（高/中优先级或证据链/工具背书检查）；普通低优先级意见仍可待确认。"
+                },
+                {
+                  "stage": "报告完成",
+                  "detail": "保留 0 条问题与建议，0 条待确认。"
+                }
+              ],
+              "metrics": {
+                "model_calls": 0,
+                "http_attempts": 0,
+                "tool_calls": 3,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "elapsed_seconds": 0.19,
+                "stages": [
+                  {
+                    "stage": "源码事实核对",
+                    "kind": "local",
+                    "elapsed_seconds": 0.001,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "read_source",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "parse_structure",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "run_static_checks",
+                    "kind": "tool",
+                    "elapsed_seconds": 0.186,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "证据校验",
+                    "kind": "local",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  },
+                  {
+                    "stage": "报告整理",
+                    "kind": "local",
+                    "elapsed_seconds": 0.0,
+                    "model_calls": 0,
+                    "http_attempts": 0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "status": "completed"
+                  }
+                ]
+              },
+              "created_at": "2026-10-23T04:16:58.705822+00:00"
+            }
+          },
+          "validation": {
+            "code_hash": "81f3251c8e3d2e7fce80660810d7b79b003fd10e2a4dc263c8d6f46169d6cdb7",
+            "status": "passed",
+            "checks": [
+              {
+                "id": "syntax",
+                "name": "syntax",
+                "status": "passed",
+                "detail": "Python AST 解析通过；未在宿主导入或执行代码。"
+              },
+              {
+                "id": "ruff",
+                "name": "ruff",
+                "status": "passed",
+                "detail": "配置的阻断静态规则通过。"
+              },
+              {
+                "id": "interface",
+                "name": "interface",
+                "status": "passed",
+                "detail": "要求 summarize_orders(orders) 函数。"
+              },
+              {
+                "id": "functional",
+                "name": "functional",
+                "status": "skipped",
+                "detail": "static_only：未执行功能测试。"
+              }
+            ],
+            "functional_executed": false,
+            "backend": "",
+            "runtime_sha256": "",
+            "passed_count": 3,
+            "failed_count": 0
+          },
+          "extension_output": {},
+          "next_nodes": [
+            "finish"
+          ]
+        },
+        "usage": {
+          "model_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0
+        },
+        "parallel": false
+      }
+    ]
+  }
+}

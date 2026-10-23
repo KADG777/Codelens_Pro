@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}body{margin:0;font:14px system-ui,sans-serif;color:#173346;background:#fff}.bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0}button,select{font:inherit;border:1px solid #b7c8d7;border-radius:7px;background:white;padding:7px 10px;color:#173346;cursor:pointer}button:hover{background:#eaf3ff}.primary{background:#2168d8;color:white}#wrap{height:465px;overflow:auto;border:1px solid #ccd9e5;border-radius:12px;background:radial-gradient(#dbe5ed 1px,transparent 1px);background-size:20px 20px}svg{display:block;touch-action:none;user-select:none}.node{cursor:grab}.port{cursor:crosshair}.edge{cursor:pointer}.selected rect{stroke:#246bdd;stroke-width:3}#hint{padding:8px 0;min-height:38px;color:#526b80}#selection{padding:6px 0}text{pointer-events:none}.danger{color:#ad293b}button:disabled{opacity:.4;cursor:default}
+</style></head><body>
+<div class="bar"><strong>连线画布</strong><select id="palette" aria-label="新增节点"></select><button id="add">添加节点</button><button id="remove">删除选中项</button><label>出口 <select id="edgeWhen"><option>always</option><option>true</option><option>false</option><option>repair</option><option>done</option></select></label><button id="fit">适应画布</button><button id="undo">撤销</button><button id="save" class="primary">应用画布</button></div>
+<div id="hint">拖动卡片调整位置；从右侧圆点拖到目标左侧圆点建立连线；点击连线后可删除或改变出口。编辑后点击“应用画布”。</div>
+<div id="wrap"><svg id="canvas" width="1850" height="1350" role="application" aria-label="工作流连线编辑器"></svg></div>
+<div id="selection">未选择节点</div>
+<script>
+"use strict";
+const svg=document.getElementById('canvas'), hint=document.getElementById('hint');
+let graph=null, catalog=[], selected=null, drag=null, connection=null, history=[], revision=0;
+const core=new Set(['coding','review','validate','gate','fix','finish']);
+const labels={coding:'编码 Agent',review:'审查 Agent',validate:'独立验收',gate:'汇合 / 判断',fix:'修复 Agent',finish:'完成 / 待处理'};
+const predicates={always:'始终为真',validation_failed:'验收存在失败',review_findings:'审查发现问题'};
+function send(type,payload={}){window.parent.postMessage({isStreamlitMessage:true,type,...payload},'*')}
+function el(tag,attrs={},text=''){const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(text)n.textContent=text;return n}
+function checkpoint(){history.push(JSON.stringify(graph));if(history.length>40)history.shift()}
+function point(e){return new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse())}
+function fit(){if(!graph)return;const w=Math.max(750,...graph.nodes.map(n=>n.x+230)),h=Math.max(450,...graph.nodes.map(n=>n.y+110));const scale=Math.min(1,(document.getElementById("wrap").clientWidth-20)/w);svg.setAttribute("viewBox",`0 0 ${w} ${h}`);svg.setAttribute("width",w*scale);svg.setAttribute("height",h*scale)}
+function dirty(){hint.textContent='画布有未应用的修改。点击“应用画布”后，服务器会校验执行路径。';hint.style.color='#965d12'}
+function draw(){
+ if(!graph)return;svg.replaceChildren();
+ const defs=el('defs'), marker=el('marker',{id:'arrow',markerWidth:10,markerHeight:10,refX:9,refY:5,orient:'auto'});marker.append(el('path',{d:'M0 0 L10 5 L0 10',fill:'#7b95ac'}));defs.append(marker);svg.append(defs);
+ graph.edges.forEach((edge,i)=>{const a=graph.nodes.find(n=>n.id===edge.source),b=graph.nodes.find(n=>n.id===edge.target);if(!a||!b)return;
+ const d=`M${a.x+178} ${a.y+34} C${a.x+235} ${a.y+34} ${b.x-60} ${b.y+34} ${b.x} ${b.y+34}`;
+ const g=el('g',{class:'edge','data-edge':i});g.append(el('path',{d,fill:'none',stroke:'transparent','stroke-width':18}),el('path',{d,fill:'none',stroke:selected?.type==='edge'&&selected.index===i?'#2168d8':'#8ca1b4','stroke-width':selected?.type==='edge'&&selected.index===i?4:2,'marker-end':'url(#arrow)'}));
+ g.append(el('text',{x:(a.x+178+b.x)/2,y:(a.y+b.y)/2+23,'font-size':12,fill:'#385773'},edge.when));g.addEventListener('pointerdown',e=>{e.stopPropagation();selected={type:'edge',index:i};document.getElementById('edgeWhen').value=edge.when;draw()});svg.append(g);
+ });
+ graph.nodes.forEach(node=>{const g=el('g',{class:'node'+(selected?.id===node.id?' selected':''),'data-node':node.id});
+ g.append(el('rect',{x:node.x,y:node.y,width:178,height:68,rx:12,fill:node.kind==='condition'?'#fff6dd':'#f1f7fd',stroke:'#9bb8ce'}),el('text',{x:node.x+12,y:node.y+27,'font-size':14,fill:'#15364c'},labels[node.id]||catalog.find(s=>s.id===node.id)?.label||'条件判断'),el('text',{x:node.x+12,y:node.y+49,'font-size':11,fill:'#637e93'},node.kind==='condition'?predicates[node.predicate]:node.id));
+ g.addEventListener('pointerdown',e=>{if(e.target.classList.contains('port'))return;checkpoint();const p=point(e);drag={id:node.id,dx:p.x-node.x,dy:p.y-node.y};selected={type:'node',id:node.id};svg.setPointerCapture(e.pointerId);draw()});
+ const input=el('circle',{cx:node.x,cy:node.y+34,r:7,fill:'#fff',stroke:'#3379ba','stroke-width':2,class:'port','data-input':node.id});
+ const output=el('circle',{cx:node.x+178,cy:node.y+34,r:7,fill:'#3379ba',class:'port','data-output':node.id});
+ output.addEventListener('pointerdown',e=>{e.stopPropagation();connection=node.id;svg.setPointerCapture(e.pointerId);hint.textContent='拖到目标节点左侧圆点，松开即可连接。'});g.append(input,output);svg.append(g);
+ });
+ const description=document.getElementById('selection');description.replaceChildren();
+ if(selected?.type==='node'){const n=graph.nodes.find(n=>n.id===selected.id);description.append(document.createTextNode(`已选择：${n.id}`));if(n.kind==='condition'){const s=document.createElement('select');s.setAttribute('aria-label','分支条件');for(const [v,l]of Object.entries(predicates)){const o=document.createElement('option');o.value=v;o.textContent=l;s.append(o)}s.value=n.predicate;s.onchange=()=>{checkpoint();n.predicate=s.value;dirty();draw()};description.append(s)}}else description.textContent=selected?.type==='edge'?'已选择连线：可更改出口或删除':'未选择节点';
+ document.getElementById('remove').disabled=!selected||(selected.type==='node'&&core.has(selected.id));
+}
+svg.addEventListener('pointermove',e=>{if(!drag)return;const n=graph.nodes.find(n=>n.id===drag.id),p=point(e);n.x=Math.max(0,Math.min(1600,Math.round(p.x-drag.dx)));n.y=Math.max(0,Math.min(1200,Math.round(p.y-drag.dy)));dirty();draw()});
+svg.addEventListener('pointerup',e=>{if(connection){const p=point(e),target=graph.nodes.find(n=>Math.hypot(p.x-n.x,p.y-n.y-34)<22);if(target&&target.id!==connection){checkpoint();const when=document.getElementById('edgeWhen').value;const edge={source:connection,target:target.id,when};if(!graph.edges.some(t=>t.source===edge.source&&t.target===edge.target&&t.when===when))graph.edges.push(edge);dirty()}connection=null;draw()}drag=null;if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId)});
+document.getElementById('edgeWhen').onchange=e=>{if(selected?.type==='edge'){checkpoint();graph.edges[selected.index].when=e.target.value;dirty();draw()}};
+document.getElementById('remove').onclick=()=>{if(!selected)return;checkpoint();if(selected.type==='edge')graph.edges.splice(selected.index,1);else if(!core.has(selected.id)){graph.nodes=graph.nodes.filter(n=>n.id!==selected.id);graph.edges=graph.edges.filter(e=>e.source!==selected.id&&e.target!==selected.id)}selected=null;dirty();draw()};
+document.getElementById('add').onclick=()=>{const value=document.getElementById('palette').value;let id=value,kind='agent';if(value==='condition'){kind='condition';let i=1;while(graph.nodes.some(n=>n.id===`condition_${i}`))i++;id=`condition_${i}`}else if(graph.nodes.some(n=>n.id===id)){hint.textContent='该 Agent 已在画布中。';return}if(graph.nodes.length>=24){hint.textContent='最多 24 个节点。';return}checkpoint();graph.nodes.push({id,kind,predicate:'always',x:80+graph.nodes.length*18,y:380});selected={type:'node',id};dirty();draw()};
+document.getElementById('fit').onclick=fit;
+document.getElementById('undo').onclick=()=>{if(history.length){graph=JSON.parse(history.pop());selected=null;dirty();draw()}};
+document.getElementById('save').onclick=()=>{send('streamlit:setComponentValue',{value:{graph,revision:++revision},dataType:'json'});hint.textContent='已提交画布，请查看下方的服务器校验结果。';hint.style.color='#236d55'};
+window.addEventListener('message',event=>{if(event.source!==window.parent||event.data?.type!=='streamlit:render')return;const args=event.data.args;catalog=args.catalog||[];const encoded=JSON.stringify(args.graph);if(!graph){graph=JSON.parse(encoded);selected=null;history=[];fit();draw()}const palette=document.getElementById('palette');palette.replaceChildren();for(const item of [{id:'condition',label:'条件分支'},...catalog]){const o=document.createElement('option');o.value=item.id;o.textContent=item.label;palette.append(o)}send('streamlit:setFrameHeight',{height:590})});
+send('streamlit:componentReady',{apiVersion:1});send('streamlit:setFrameHeight',{height:590});
+</script></body></html>

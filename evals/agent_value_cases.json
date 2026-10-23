@@ -1,0 +1,849 @@
+{
+  "schema_version": 1,
+  "suite_id": "agent-value-20261023-v1",
+  "frozen_at": "2026-10-23T04:08:00.130440+00:00",
+  "fresh_specs": [
+    {
+      "id": "av-csv-v1",
+      "label": "严格 CSV 状态机",
+      "task": "实现 parse_csv(text)，仅用标准库，返回二维字符串列表。输入只使用逗号分隔、LF 换行（CR 是普通字符）；引号仅能出现在字段开头，带引号字段内允许逗号和 LF，两个连续双引号表示一个双引号。结束引号后只能是逗号、LF 或 EOF；未闭合引号、普通字段里的引号、结束引号后其他字符均抛 ValueError。空文本返回 []；空行是 [\"\"]；最后一个 LF 只终止当前行，不额外生成空行；尾逗号产生空字段。不得修改输入。",
+      "entrypoint": "parse_csv",
+      "parameters": [
+        "text"
+      ],
+      "public_cases": [
+        {
+          "id": "p1",
+          "args": [
+            "a,b\nc,d"
+          ],
+          "expected": [
+            [
+              "a",
+              "b"
+            ],
+            [
+              "c",
+              "d"
+            ]
+          ]
+        },
+        {
+          "id": "p2",
+          "args": [
+            "\"a,b\",c"
+          ],
+          "expected": [
+            [
+              "a,b",
+              "c"
+            ]
+          ]
+        },
+        {
+          "id": "p3",
+          "args": [
+            ""
+          ],
+          "expected": []
+        },
+        {
+          "id": "p4",
+          "args": [
+            "\"a"
+          ],
+          "raises": "ValueError"
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "h1",
+          "args": [
+            "\n"
+          ],
+          "expected": [
+            [
+              ""
+            ]
+          ]
+        },
+        {
+          "id": "h2",
+          "args": [
+            "a,\n"
+          ],
+          "expected": [
+            [
+              "a",
+              ""
+            ]
+          ]
+        },
+        {
+          "id": "h3",
+          "args": [
+            "\"a\nb\",\"x\"\"y\""
+          ],
+          "expected": [
+            [
+              "a\nb",
+              "x\"y"
+            ]
+          ]
+        },
+        {
+          "id": "h4",
+          "args": [
+            "a\n\n"
+          ],
+          "expected": [
+            [
+              "a"
+            ],
+            [
+              ""
+            ]
+          ]
+        },
+        {
+          "id": "h5",
+          "args": [
+            "\"a\"x"
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h6",
+          "args": [
+            "ab\"c"
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h7",
+          "args": [
+            "\"\""
+          ],
+          "expected": [
+            [
+              ""
+            ]
+          ]
+        },
+        {
+          "id": "h8",
+          "args": [
+            ","
+          ],
+          "expected": [
+            [
+              "",
+              ""
+            ]
+          ]
+        },
+        {
+          "id": "h9",
+          "args": [
+            "a\rb"
+          ],
+          "expected": [
+            [
+              "a\rb"
+            ]
+          ]
+        },
+        {
+          "id": "h10",
+          "args": [
+            "\"\"\"\""
+          ],
+          "expected": [
+            [
+              "\""
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "av-pointer-v1",
+      "label": "JSON 指针与转义",
+      "task": "实现 resolve_pointer(document, pointer)。只用标准库。pointer 为字符串；空字符串返回 document；非空必须以 / 开头，按 / 分割后逐个 token 解码 ~1 为 /、~0 为 ~，单次从左到右解码，不递归；任何其他 ~ 转义或尾 ~ 抛 ValueError。字典按解码后的字符串 key 查找；列表索引只允许 ASCII 0 或 [1-9][0-9]*，不允许负数、加号、前导零、Unicode 数字和 -。索引非法或越界、字典缺 key、继续遍历标量都抛 ValueError。字符串 key 的 01 在字典内合法。不得修改 document。",
+      "entrypoint": "resolve_pointer",
+      "parameters": [
+        "document",
+        "pointer"
+      ],
+      "public_cases": [
+        {
+          "id": "p1",
+          "args": [
+            {
+              "a": [
+                7,
+                9
+              ]
+            },
+            "/a/1"
+          ],
+          "expected": 9
+        },
+        {
+          "id": "p2",
+          "args": [
+            {
+              "a/b": 3
+            },
+            "/a~1b"
+          ],
+          "expected": 3
+        },
+        {
+          "id": "p3",
+          "args": [
+            {
+              "x": 1
+            },
+            ""
+          ],
+          "expected": {
+            "x": 1
+          }
+        },
+        {
+          "id": "p4",
+          "args": [
+            [
+              1
+            ],
+            "/2"
+          ],
+          "raises": "ValueError"
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "h1",
+          "args": [
+            {
+              "~1": 4
+            },
+            "/~01"
+          ],
+          "expected": 4
+        },
+        {
+          "id": "h2",
+          "args": [
+            {
+              "": {
+                "": 5
+              }
+            },
+            "//"
+          ],
+          "expected": 5
+        },
+        {
+          "id": "h3",
+          "args": [
+            [
+              1,
+              2
+            ],
+            "/01"
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h4",
+          "args": [
+            [
+              1,
+              2
+            ],
+            "/-1"
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h5",
+          "args": [
+            [
+              1,
+              2
+            ],
+            "/١"
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h6",
+          "args": [
+            {
+              "01": 8
+            },
+            "/01"
+          ],
+          "expected": 8
+        },
+        {
+          "id": "h7",
+          "args": [
+            {},
+            "/x"
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h8",
+          "args": [
+            {
+              "a": 2
+            },
+            "/a/b"
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h9",
+          "args": [
+            {
+              "a": 2
+            },
+            "a"
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h10",
+          "args": [
+            {},
+            "/~2"
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h11",
+          "args": [
+            {
+              "a~": 2
+            },
+            "/a~"
+          ],
+          "raises": "ValueError"
+        }
+      ]
+    },
+    {
+      "id": "av-layers-v1",
+      "label": "依赖批次与循环检测",
+      "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+      "entrypoint": "dependency_layers",
+      "parameters": [
+        "dependencies"
+      ],
+      "public_cases": [
+        {
+          "id": "p1",
+          "args": [
+            {
+              "b": [
+                "a"
+              ],
+              "a": []
+            }
+          ],
+          "expected": [
+            [
+              "a"
+            ],
+            [
+              "b"
+            ]
+          ]
+        },
+        {
+          "id": "p2",
+          "args": [
+            {}
+          ],
+          "expected": []
+        },
+        {
+          "id": "p3",
+          "args": [
+            {
+              "a": [
+                "a"
+              ]
+            }
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "p4",
+          "args": [
+            {
+              "z": [
+                "a",
+                "a"
+              ]
+            }
+          ],
+          "expected": [
+            [
+              "a"
+            ],
+            [
+              "z"
+            ]
+          ]
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "h1",
+          "args": [
+            {
+              "d": [
+                "b",
+                "c"
+              ],
+              "c": [
+                "a"
+              ],
+              "b": [
+                "a"
+              ]
+            }
+          ],
+          "expected": [
+            [
+              "a"
+            ],
+            [
+              "b",
+              "c"
+            ],
+            [
+              "d"
+            ]
+          ]
+        },
+        {
+          "id": "h2",
+          "args": [
+            {
+              "a": [],
+              "z": [
+                "y"
+              ],
+              "y": [
+                "z"
+              ]
+            }
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h3",
+          "args": [
+            {
+              "b": [
+                "a"
+              ],
+              "c": [],
+              "d": [
+                "b"
+              ]
+            }
+          ],
+          "expected": [
+            [
+              "a",
+              "c"
+            ],
+            [
+              "b"
+            ],
+            [
+              "d"
+            ]
+          ]
+        },
+        {
+          "id": "h4",
+          "args": [
+            {
+              "x": [
+                "q"
+              ],
+              "y": [
+                "q"
+              ],
+              "q": []
+            }
+          ],
+          "expected": [
+            [
+              "q"
+            ],
+            [
+              "x",
+              "y"
+            ]
+          ]
+        },
+        {
+          "id": "h5",
+          "args": [
+            {
+              "B": [],
+              "a": [],
+              "A": []
+            }
+          ],
+          "expected": [
+            [
+              "A",
+              "B",
+              "a"
+            ]
+          ]
+        },
+        {
+          "id": "h6",
+          "args": [
+            {
+              "a": [
+                "b"
+              ],
+              "b": [
+                "c"
+              ],
+              "c": [
+                "a"
+              ]
+            }
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h7",
+          "args": [
+            {
+              "a": [],
+              "b": []
+            }
+          ],
+          "expected": [
+            [
+              "a",
+              "b"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "av-transfer-v1",
+      "label": "事务转账与输入保护",
+      "task": "实现 apply_transfers(accounts, transfers)。accounts 是字符串账户名到余额的字典，余额必须是非负 int 且 bool 不算 int；transfers 是 [from,to,amount] 的列表，amount 必须是严格正 int 且 bool 不算 int。按顺序在工作副本转账；任何未知账户、非法余额/金额、结构错误或当时余额不足均抛 ValueError。不能用后续入账抵销之前的余额不足；同账户转账仍须验证金额及余额，成功后余额不变。空 transfers 返回相等但独立的字典，任何成功或失败均不得修改 accounts 或 transfers。只用标准库。",
+      "entrypoint": "apply_transfers",
+      "parameters": [
+        "accounts",
+        "transfers"
+      ],
+      "public_cases": [
+        {
+          "id": "p1",
+          "args": [
+            {
+              "a": 10,
+              "b": 0
+            },
+            [
+              [
+                "a",
+                "b",
+                4
+              ]
+            ]
+          ],
+          "expected": {
+            "a": 6,
+            "b": 4
+          }
+        },
+        {
+          "id": "p2",
+          "args": [
+            {
+              "a": 2,
+              "b": 0
+            },
+            [
+              [
+                "a",
+                "b",
+                3
+              ]
+            ]
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "p3",
+          "args": [
+            {
+              "a": 3
+            },
+            []
+          ],
+          "expected": {
+            "a": 3
+          }
+        },
+        {
+          "id": "p4",
+          "args": [
+            {
+              "a": true
+            },
+            []
+          ],
+          "raises": "ValueError"
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "h1",
+          "args": [
+            {
+              "a": 5
+            },
+            [
+              [
+                "a",
+                "a",
+                5
+              ]
+            ]
+          ],
+          "expected": {
+            "a": 5
+          }
+        },
+        {
+          "id": "h2",
+          "args": [
+            {
+              "a": 5
+            },
+            [
+              [
+                "a",
+                "a",
+                6
+              ]
+            ]
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h3",
+          "args": [
+            {
+              "a": 2,
+              "b": 0
+            },
+            [
+              [
+                "a",
+                "b",
+                true
+              ]
+            ]
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h4",
+          "args": [
+            {
+              "a": 2,
+              "b": 0
+            },
+            [
+              [
+                "a",
+                "b",
+                0
+              ]
+            ]
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h5",
+          "args": [
+            {
+              "a": 2,
+              "b": 0
+            },
+            [
+              [
+                "a",
+                "b",
+                -1
+              ]
+            ]
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h6",
+          "args": [
+            {
+              "a": 2,
+              "b": 0
+            },
+            [
+              [
+                "a",
+                "b",
+                2
+              ],
+              [
+                "a",
+                "b",
+                1
+              ]
+            ]
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h7",
+          "args": [
+            {
+              "a": 2,
+              "b": 5
+            },
+            [
+              [
+                "a",
+                "b",
+                3
+              ],
+              [
+                "b",
+                "a",
+                3
+              ]
+            ]
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h8",
+          "args": [
+            {
+              "a": 2
+            },
+            [
+              [
+                "a",
+                "x",
+                1
+              ]
+            ]
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h9",
+          "args": [
+            {
+              "a": 2
+            },
+            [
+              [
+                "a",
+                "a"
+              ]
+            ]
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h10",
+          "args": [
+            {
+              "a": -1
+            },
+            []
+          ],
+          "raises": "ValueError"
+        },
+        {
+          "id": "h11",
+          "args": [
+            {
+              "a": 2,
+              "b": 0
+            },
+            [
+              [
+                "a",
+                "b",
+                2
+              ],
+              [
+                "b",
+                "a",
+                1
+              ]
+            ]
+          ],
+          "expected": {
+            "a": 1,
+            "b": 1
+          }
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "av-csv-v1",
+      "task_id": "av-csv-v1",
+      "task": "实现 parse_csv(text)，仅用标准库，返回二维字符串列表。输入只使用逗号分隔、LF 换行（CR 是普通字符）；引号仅能出现在字段开头，带引号字段内允许逗号和 LF，两个连续双引号表示一个双引号。结束引号后只能是逗号、LF 或 EOF；未闭合引号、普通字段里的引号、结束引号后其他字符均抛 ValueError。空文本返回 []；空行是 [\"\"]；最后一个 LF 只终止当前行，不额外生成空行；尾逗号产生空字段。不得修改输入。",
+      "source": "def parse_csv(text):\n    return [line.split(\",\") for line in text.splitlines()]\n",
+      "split": "fresh"
+    },
+    {
+      "id": "av-pointer-v1",
+      "task_id": "av-pointer-v1",
+      "task": "实现 resolve_pointer(document, pointer)。只用标准库。pointer 为字符串；空字符串返回 document；非空必须以 / 开头，按 / 分割后逐个 token 解码 ~1 为 /、~0 为 ~，单次从左到右解码，不递归；任何其他 ~ 转义或尾 ~ 抛 ValueError。字典按解码后的字符串 key 查找；列表索引只允许 ASCII 0 或 [1-9][0-9]*，不允许负数、加号、前导零、Unicode 数字和 -。索引非法或越界、字典缺 key、继续遍历标量都抛 ValueError。字符串 key 的 01 在字典内合法。不得修改 document。",
+      "source": "def resolve_pointer(document, pointer):\n    value = document\n    for token in pointer.split(\"/\")[1:]:\n        value = value[int(token)] if isinstance(value, list) else value[token]\n    return value\n",
+      "split": "fresh"
+    },
+    {
+      "id": "av-layers-v1",
+      "task_id": "av-layers-v1",
+      "task": "实现 dependency_layers(dependencies)。输入 dict[str,list[str]]，key 为任务、value 为其前置任务。只作为前置出现的任务也加入图；重复前置只算一次。返回逐批可并行任务 list[list[str]]：每批包含当轮开始时所有前置均已在更早批次完成的剩余任务，批内按 Python 字符串字典序排序；空图返回 []。只要任意连通分量存在循环（含自环），抛 ValueError，不返回部分成功批次。不得修改原字典或列表。只用标准库。",
+      "source": "def dependency_layers(dependencies):\n    return [sorted(dependencies)] if dependencies else []\n",
+      "split": "fresh"
+    },
+    {
+      "id": "av-transfer-v1",
+      "task_id": "av-transfer-v1",
+      "task": "实现 apply_transfers(accounts, transfers)。accounts 是字符串账户名到余额的字典，余额必须是非负 int 且 bool 不算 int；transfers 是 [from,to,amount] 的列表，amount 必须是严格正 int 且 bool 不算 int。按顺序在工作副本转账；任何未知账户、非法余额/金额、结构错误或当时余额不足均抛 ValueError。不能用后续入账抵销之前的余额不足；同账户转账仍须验证金额及余额，成功后余额不变。空 transfers 返回相等但独立的字典，任何成功或失败均不得修改 accounts 或 transfers。只用标准库。",
+      "source": "def apply_transfers(accounts, transfers):\n    result = accounts.copy()\n    for sender, receiver, amount in transfers:\n        result[sender] -= amount\n        result[receiver] += amount\n    return result\n",
+      "split": "fresh"
+    }
+  ]
+}

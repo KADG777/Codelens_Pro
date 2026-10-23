@@ -3,6 +3,7 @@
 from html import escape
 
 from ui.diff_view import diff_counts
+from ui.execution_graph import node_states
 from workflow.models import requires_measured_evidence
 from workflow.node_registry import default_registry
 
@@ -42,6 +43,7 @@ def role_cards(snapshot: dict) -> list[dict]:
     terminal = status in {"completed_static", "completed_verified", "needs_attention", "failed"}
     cards = []
     extension_labels = {s.id: (s.label, s.description) for s in default_registry().all()}
+    canvas_states = node_states(snapshot) if snapshot.get("workflow_config", {}).get("canvas") else {}
     roles = [*ROLES, *((node, *extension_labels.get(node, (node, "执行已注册角色的交接合同")))
                       for node in snapshot.get("workflow_config", {}).get("extension_nodes", []))]
     for node, title, purpose in roles:
@@ -93,9 +95,11 @@ def role_cards(snapshot: dict) -> list[dict]:
             branch_blocked = affected == "inspect" and status in {"blocked", "failed"} and (
                 (node == "validate" and validation.get("status") == "error")
                 or (node == "review" and review.get("code_hash") != digest))
-            if affected == node or branch_blocked:
+            if affected == node or branch_blocked or canvas_states.get(node) == "paused":
                 state = {"paused": "paused", "blocked": "blocked", "failed": "failed"}[status]
                 detail = snapshot.get("error") or ("进度已保存，继续时从这里恢复" if status == "paused" else "保留已有源码与结果")
+        if snapshot.get("canvas_cursor", {}).get("outcomes", {}).get(node) == "skipped":
+            state, detail = "skipped", "条件分支未选择该节点"
         cards.append({"node": node, "title": title, "state": state, "label": STATE_LABELS[state], "detail": detail})
     return cards
 
@@ -124,11 +128,15 @@ def build_progress_html(snapshot: dict) -> str:
         for index, card in enumerate(cards, 1)
     )
     path = "编码 → 审查 ∥ 独立验收 → 汇合判断" if parallel else "编码 → 审查 → 独立验收 → 判断"
+    execution_label = "并行检查" if parallel else "顺序检查"
+    if snapshot.get("workflow_config", {}).get("canvas"):
+        path = "依据已冻结画布的依赖和条件逐波执行，实际路径见上方运行图"
+        execution_label = "画布调度"
     return f"""<style>
 .flow-board{{background:#f7fafc;border:1px solid #d8e4ec;border-radius:14px;padding:18px;margin:12px 0 22px;color:#18334b}}
 .flow-heading{{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:14px;font-size:14px}}
 .flow-heading strong{{font-size:17px}}.flow-heading span{{color:#506779;font-size:12px}}
-.flow-grid{{display:grid;grid-template-columns:repeat({len(cards)},minmax(0,1fr));gap:10px}}
+.flow-grid{{display:grid;grid-template-columns:repeat({min(4, len(cards))},minmax(0,1fr));gap:10px}}
 .flow-card{{background:white;border:1px solid #dbe4ea;border-radius:11px;padding:13px;min-height:128px}}
 .flow-card h4{{font-size:15px;margin:10px 0 6px;color:#17344d}}.flow-card p{{font-size:12px;line-height:1.6;margin:0;color:#52697b}}
 .role-top{{display:flex;justify-content:space-between;font-size:11px;color:#637b8e}}.role-top b{{font-size:13px}}
@@ -137,7 +145,7 @@ def build_progress_html(snapshot: dict) -> str:
 .flow-card.skipped{{background:#f0f3f5;opacity:.8}}.flow-card.blocked,.flow-card.attention,.flow-card.paused{{border-top:3px solid #d99523}}
 .flow-card.failed{{border-top:3px solid #c94c4c}}.flow-route{{font-size:12px;color:#456376;margin-top:13px;line-height:1.8}}
 @media(max-width:750px){{.flow-grid{{grid-template-columns:repeat(2,minmax(0,1fr))}}.flow-heading{{display:block}}}}
-</style><section class="flow-board" aria-label="流程实时状态"><div class="flow-heading"><strong>{escape(header)}</strong><span>修复 {snapshot.get('fix_round', 0)} / {snapshot.get('max_fix_rounds', 2)} 轮 · {'并行检查' if parallel else '顺序检查'}</span></div><div class="flow-grid">{rendered}</div><div class="flow-route">{path}；有问题 → 修复 → 重新审查与验收。<br>正在执行的状态来自节点开始通知；只有已提交的源码与检查可作为结果证据。</div></section>"""
+</style><section class="flow-board" aria-label="流程实时状态"><div class="flow-heading"><strong>{escape(header)}</strong><span>修复 {snapshot.get('fix_round', 0)} / {snapshot.get('max_fix_rounds', 2)} 轮 · {execution_label}</span></div><div class="flow-grid">{rendered}</div><div class="flow-route">{path}；有问题 → 修复 → 重新审查与验收。<br>正在执行的状态来自节点开始通知；只有已提交的源码与检查可作为结果证据。</div></section>"""
 
 
 def result_summary(snapshot: dict) -> list[dict]:

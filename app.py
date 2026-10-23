@@ -534,7 +534,11 @@ def _render_run(service: WorkflowRunService, snapshot: dict, settings: Settings,
         st.caption(f"来源运行：[打开 {parent[:10]}](?run={quote(parent, safe='')}) · 历史记录不变，本轮产物仍需重新审查和验收。")
     with st.expander("本次保存的编排计划与用量"):
         plan = {**DEFAULT_PLAN, **snapshot["workflow_config"]} if snapshot.get("workflow_config") else {**DEFAULT_PLAN, "max_fix_rounds": snapshot.get("max_fix_rounds", 2)}
-        st.write(f"检查方式：{'并行分支，完成后汇合' if plan['parallel_checks'] else '顺序执行'} · 修复循环：{'开启' if plan['enable_repair'] else '关闭'} · 最多 {plan['max_fix_rounds']} 轮 · 审查后暂停：{'开启' if plan['pause_after_review'] else '关闭'}")
+        inspection = "按已冻结画布连线执行" if plan.get("canvas") else "并行分支，完成后汇合" if plan['parallel_checks'] else "顺序执行"
+        st.write(f"检查方式：{inspection} · 修复循环：{'开启' if plan['enable_repair'] else '关闭'} · 最多 {plan['max_fix_rounds']} 轮 · 审查后暂停：{'开启' if plan['pause_after_review'] else '关闭'}")
+        if plan.get("canvas"):
+            st.caption(f"画布 SHA-256：{snapshot.get('canvas_hash', '')}")
+            st.json(plan["canvas"], expanded=False)
         st.caption("这是该运行已保存的计划，修改新任务的编排不会改变本记录。")
         st.caption(f"验收合同：{snapshot.get('acceptance_id', '自定义目标')}")
         overlaps = branch_overlap_evidence(snapshot)

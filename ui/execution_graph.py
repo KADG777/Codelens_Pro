@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 
 import streamlit as st
 
+from workflow.canvas import CanvasGraph, ready_nodes
 from workflow.node_registry import default_registry
 
 LABELS = {"coding": "编码 Agent", "review": "审查 Agent", "validate": "独立验收", "gate": "汇合 / 判断",
@@ -16,6 +17,9 @@ COLORS = {"waiting": ("#f4f7fb", "#9aaebf"), "active": ("#e3f0ff", "#2267d7"),
 
 def node_states(snapshot: dict) -> dict:
     states = {}
+    for node, outcome in snapshot.get("canvas_cursor", {}).get("outcomes", {}).items():
+        if outcome == "skipped":
+            states[node] = "waiting"
     for record in snapshot.get("node_runs", []):
         states[record["node"]] = "blocked" if record.get("error") or record.get("status") == "needs_attention" else "finished"
     for node in snapshot.get("active_nodes", []):
@@ -23,6 +27,12 @@ def node_states(snapshot: dict) -> dict:
     if snapshot.get("status") == "paused":
         for node in snapshot.get("pending_nodes", []):
             states[node] = "paused"
+        if snapshot.get("workflow_config", {}).get("canvas"):
+            graph = CanvasGraph.model_validate(snapshot["workflow_config"]["canvas"])
+            cursor = snapshot.get("canvas_cursor", {})
+            pending = ["fix"] if cursor.get("repair") else ready_nodes(graph, dict(cursor.get("outcomes", {})))
+            for node in pending:
+                states[node] = "paused"
     if snapshot.get("status") == "blocked":
         states[snapshot.get("phase")] = "blocked"
     return states
@@ -50,6 +60,14 @@ def build_execution_svg(plan: dict, snapshot: dict | None = None, selected: str 
         edges += [("gate", "fix"), ("fix", "review")]
         if parallel:
             edges.append(("fix", "validate"))
+    canvas = plan.get("canvas")
+    if canvas:
+        try:
+            canvas = CanvasGraph.model_validate(canvas).model_dump()
+        except ValueError:
+            return '<p>画布结构尚不完整，请修正后再查看执行预览。</p>'
+        positions = {n["id"]: (n.get("x", 0), n.get("y", 0)) for n in canvas.get("nodes", [])}
+        edges = [(e["source"], e["target"]) for e in canvas.get("edges", []) if e.get("source") in positions and e.get("target") in positions]
     states = node_states(snapshot)
     observed = set()
     for record in snapshot.get("node_runs", []):
@@ -64,6 +82,8 @@ def build_execution_svg(plan: dict, snapshot: dict | None = None, selected: str 
             observed.add((source, target))
         if source == "gate" and record.get("status") in {"completed_verified", "completed_static", "needs_attention"}:
             observed.add(("gate", "finish"))
+    if canvas:
+        observed = {(e["source"], e["target"]) for e in snapshot.get("canvas_edges", []) if e.get("round") == snapshot.get("fix_round", 0)}
     paths, boxes = [], []
     for source, target in edges:
         sx, sy = positions[source]
@@ -78,12 +98,15 @@ def build_execution_svg(plan: dict, snapshot: dict | None = None, selected: str 
         else:
             d = f"M{sx+165} {sy+30} H{(sx+165+tx)/2} V{ty+30} H{tx}"
         paths.append(f'<path data-edge="{escape(source)}:{escape(target)}" d="{d}" fill="none" stroke="{color}" stroke-width="{3 if taken or active else 1.5}" marker-end="url(#route-arrow)"/>')
+        if canvas:
+            labels = "/".join(e.get("when", "always") for e in canvas["edges"] if e["source"] == source and e["target"] == target)
+            paths.append(f'<text x="{(sx+165+tx)/2}" y="{(sy+ty)/2+20}" font-size="11" fill="#426078">{escape(labels)}</text>')
     for node, (x, y) in positions.items():
         state = states.get(node, "waiting")
         if node == "finish" and snapshot.get("status") in {"completed_static", "completed_verified", "needs_attention"}:
             state = "blocked" if snapshot["status"] == "needs_attention" else "finished"
         fill, border = COLORS[state]
-        skipped = node == "fix" and not repair or node == "coding" and snapshot.get("input_mode") == "upload"
+        skipped = node == "fix" and not repair or node == "coding" and snapshot.get("input_mode") == "upload" or snapshot.get("canvas_cursor", {}).get("outcomes", {}).get(node) == "skipped"
         records = [r for r in snapshot.get("node_runs", []) if r["node"] == node]
         detail = "自动跳过" if skipped else "运行中" if state == "active" else "已暂停 · 待继续" if state == "paused" else "待执行" if live else "计划节点"
         if node == "finish" and state in {"finished", "blocked"}:
@@ -96,12 +119,16 @@ def build_execution_svg(plan: dict, snapshot: dict | None = None, selected: str 
             href = "?" + urlencode({"run": snapshot["run_id"], "node": node}) + "#node-handoff"
             shape = f'<a href="{escape(href, quote=True)}" target="_self">{shape}</a>'
         boxes.append(shape)
-    title = ("并行" if parallel else "顺序") + ("运行路径" if live else "工作流预览")
-    return f'<svg viewBox="0 0 865 {390+90*len(extensions)}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{title}" style="width:100%;max-height:510px"><defs><marker id="route-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#7696a9"/></marker></defs>{"".join(paths)}{"".join(boxes)}</svg>'
+    title = ("画布" if canvas else "并行" if parallel else "顺序") + ("运行路径" if live else "工作流预览")
+    width = max(865, max((x + 210 for x, _ in positions.values()), default=865))
+    height = max(390, max((y + 100 for _, y in positions.values()), default=390))
+    return f'<svg viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{title}" style="width:100%;max-height:650px"><defs><marker id="route-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#7696a9"/></marker></defs>{"".join(paths)}{"".join(boxes)}</svg>'
 
 
 def render_node_details(snapshot: dict) -> None:
     nodes = ["coding", "review", "validate", *snapshot.get("workflow_config", {}).get("extension_nodes", []), "gate", "fix"]
+    if snapshot.get("workflow_config", {}).get("canvas"):
+        nodes = [n["id"] for n in snapshot["workflow_config"]["canvas"]["nodes"] if n["id"] != "finish"]
     selected = st.query_params.get("node", st.session_state.get(f"selected_node_{snapshot['run_id']}", snapshot.get("phase", "review")))
     if selected not in nodes:
         selected = "review"
@@ -148,4 +175,4 @@ def render_node_details(snapshot: dict) -> None:
                 for step in output.get("next_steps", []):
                     st.write("下一步：" + step)
             st.caption("这是 Agent 对现有证据的解读；功能通过以独立验收记录为准。")
-    st.caption("绿色连线是实际完成的路由，蓝色表示当前执行节点，红色表示节点错误。并行节点耗时不能直接相加为总耗时。")
+    st.caption("画布绿色连线显示当前修复轮的实际路由，蓝色表示当前执行节点，红色表示节点错误。并行节点耗时不能直接相加为总耗时；节点详情保留全部轮次。")
