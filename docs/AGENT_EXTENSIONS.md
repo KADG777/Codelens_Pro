@@ -22,15 +22,19 @@ registry.register(NodeSpec(
     reads=('validation',),
 ))
 service = WorkflowRunService('data/example.sqlite3', node_registry=registry)
-run_id = service.create_run(
-    task='按所选合同完成文本统计', acceptance_id='text-stats-v1',
-    workflow_config={'extension_nodes': ['evidence_summary']},
-)
-result = service.execute(run_id)
-service.close()
+try:
+    run_id = service.create_run(
+        task='按所选合同完成文本统计', acceptance_id='text-stats-v1',
+        mode='demo', validation_profile='static_only',
+        workflow_config={'extension_nodes': ['evidence_summary']},
+    )
+    result = service.execute(run_id)
+    print(result['status'], result['node_outputs']['evidence_summary']['summary'])
+finally:
+    service.close()
 ```
 
-这个例子是确定性角色。模型角色可通过 `context.complete(OutputSchema, system, payload)` 调用模型，内置验收解读角色就是完整例子。只需注册和选入执行计划，无须修改 `WorkflowRunService` 的中心分发、条件边或 UI 路由代码。页面展示内置注册表；新增可选项应在 `default_registry()` 的组合入口注册。
+这个例子使用固定核心角色与确定性扩展，不调用模型；预期为 `completed_static` 并输出验收摘要，功能尚未执行。模型角色可通过 `context.complete(OutputSchema, system, payload)` 调用模型，内置验收解读角色就是完整例子。只需注册和选入执行计划，无须修改 `WorkflowRunService` 的中心分发、条件边或 UI 路由代码。页面展示内置注册表；新增可选项应在 `default_registry()` 的组合入口注册。
 
 ## 输入、输出和状态权限
 
@@ -41,7 +45,7 @@ service.close()
 | 输出 | `NodeOutput` 或其子类；必须包含当前 code_hash 和非空 summary，禁止未声明字段 |
 | 写入 | 仅 `node_outputs[节点ID]` 和 `node_output_history`；保留节点版本与源码哈希 |
 | 模型使用 | 通过统一预算包装器；调用、token、格式错误和失败均记账 |
-| 路由 | 在检查汇合后、判断节点前，按 extension_nodes 顺序执行；最多 4 个扩展 |
+| 路由 | 标准模板在检查汇合后、判断节点前按 extension_nodes 顺序执行；最多 16 个扩展 |
 | 恢复 | 保存 ID→版本清单；缺失或版本变化时停止，恢复原插件或新建任务 |
 
 扩展输入中的可变对象与核心状态隔离。错误哈希或不符合输出合同会停止，不能伪造成功、覆盖源码、改写验证结果或控制 next_node。每次执行与核心节点共用开始通知、计时、错误处理、持久化交接与可视化。
