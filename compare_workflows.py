@@ -128,7 +128,7 @@ def run_workflow(case, settings, factory, db_path):
     started = time.perf_counter()
     with_service = WorkflowRunService(db_path, model_factory=factory)
     run_id = with_service.create_run(case["task"], source=case.get("source"), mode="live", acceptance_id=case["task_id"],
-        validation_profile="functional_portable", workflow_config={"parallel_checks": True, "extension_nodes": ["acceptance_explainer"]},
+        validation_profile="functional_portable", workflow_config={"parallel_checks": True, "extension_nodes": ["acceptance_explainer"], "review_strategy": "full"},
         budget_limits={"max_model_calls": 18, "max_tokens": 40_000, "max_active_seconds": 240.0})
     try:
         result = with_service.execute(run_id, settings=settings)

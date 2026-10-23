@@ -68,7 +68,9 @@ def role_cards(snapshot: dict) -> list[dict]:
                 detail = f"检查 {passed} 项通过 / {failed} 项未通过；" + ("已执行功能用例" if validation.get("functional_executed") else "功能未执行")
         elif node == "fix":
             records = [r for r in snapshot.get("repair_records", []) if not r.get("inherited")]
-            if snapshot.get("termination_reason") in {"no_progress", "repeated_code"}:
+            if snapshot.get("termination_reason") == "candidate_rejected":
+                state, detail = "attention", "候选复验未通过保护检查，当前源码保留上一版本"
+            elif snapshot.get("termination_reason") in {"no_progress", "repeated_code"}:
                 state, detail = "attention", "候选未形成新的有效源码版本"
             elif records:
                 state, detail = "done", f"本轮已提交 {len(records)} 次修复，改后仍须审查与验收"

@@ -15,6 +15,7 @@ class WorkflowConfig(BaseModel):
     enable_repair: bool = True
     max_fix_rounds: int = Field(default=2, ge=0, le=2)
     pause_after_review: bool = False
+    review_strategy: Literal["focused", "full"] = "focused"
     extension_nodes: list[str] = Field(default_factory=list, max_length=16)
     canvas: CanvasGraph | None = None
 

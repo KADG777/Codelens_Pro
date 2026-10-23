@@ -5,7 +5,7 @@ import streamlit as st
 from ui.execution_graph import build_execution_svg
 from workflow.node_registry import default_registry
 
-DEFAULT_PLAN = {"parallel_checks": False, "max_fix_rounds": 2, "enable_repair": True, "pause_after_review": False, "extension_nodes": []}
+DEFAULT_PLAN = {"parallel_checks": False, "max_fix_rounds": 2, "enable_repair": True, "pause_after_review": False, "extension_nodes": [], "review_strategy": "focused"}
 NODES = [
     ("coding", "① 编码 Agent", "根据本次目标生成完整源码。上传已有代码时自动跳过这个节点。"),
     ("review", "② 审查 Agent", "给出问题、源码证据与需求核对。可与独立验收并行执行，完成后汇合。"),
@@ -29,6 +29,7 @@ def _reset_plan() -> None:
     st.session_state.flow_max_rounds = 2
     st.session_state.flow_pause = False
     st.session_state.flow_extensions = []
+    st.session_state.flow_review_strategy = "focused"
     st.session_state.flow_canvas_graph = None
     st.session_state.flow_canvas_mode = False
 
@@ -41,7 +42,8 @@ def render_workflow_editor() -> dict:
     plan = saved_editor_plan()
     defaults = {"flow_execution_order": "并行执行" if plan["parallel_checks"] else "顺序执行",
                 "flow_enable_repair": plan["enable_repair"], "flow_max_rounds": plan["max_fix_rounds"],
-                "flow_pause": plan["pause_after_review"], "flow_extensions": plan.get("extension_nodes", [])}
+                "flow_pause": plan["pause_after_review"], "flow_extensions": plan.get("extension_nodes", []),
+                "flow_review_strategy": plan.get("review_strategy", "focused")}
     for key, value in defaults.items():
         st.session_state.setdefault(key, value)
     selected = st.session_state.get("flow_editor_node", "review")
@@ -62,11 +64,15 @@ def render_workflow_editor() -> dict:
             rounds = st.number_input("最多修复轮数", min_value=0, max_value=2, step=1, key="flow_max_rounds", disabled=not enable)
             pause = st.checkbox("首次审查后暂停", key="flow_pause", help="顺序模式在审查提交后暂停；并行模式在审查和验收均完成并汇合后暂停。")
         registered = {spec.id: spec for spec in default_registry().all()}
+        strategy = st.selectbox("审查策略", ["focused", "full"], key="flow_review_strategy",
+            format_func=lambda s: "精简审查 + 可执行反例（推荐）" if s == "focused" else "完整工具审查（历史策略）",
+            help="精简策略适用于绑定合同的便携功能验收：一次请求完成核对，反例经隔离执行后供人工核对；自动修复依据独立验收，更新源码前保护已通过的冻结用例。其他任务保留完整审查。")
         extensions = st.multiselect("汇合后接入扩展 Agent", list(registered), key="flow_extensions",
             format_func=lambda key: registered[key].label,
             help="按选择顺序执行，统一输入输出合同与运行预算；解读建议不会改变独立验收结论。")
         plan = {"parallel_checks": execution == "并行执行", "max_fix_rounds": int(rounds),
-                "enable_repair": bool(enable), "pause_after_review": bool(pause), "extension_nodes": extensions}
+                "enable_repair": bool(enable), "pause_after_review": bool(pause), "extension_nodes": extensions,
+                "review_strategy": strategy}
         if st.checkbox("使用拖拽连线画布执行", key="flow_canvas_mode"):
             from ui.canvas_editor import render_canvas
             plan = render_canvas(plan, default_registry())

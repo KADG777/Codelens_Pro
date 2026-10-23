@@ -1,0 +1,900 @@
+{
+  "schema_version": 1,
+  "suite_id": "focused-workflow-v1",
+  "frozen_at": "2026-10-23T05:14:05.774577+00:00",
+  "fresh_specs": [
+    {
+      "id": "opt-ranges-v1",
+      "label": "ranges",
+      "task": "实现 merge_ranges(ranges)：输入为由两个整数构成的区间列表，每个区间表示 [start,end)，允许负数；bool 不算整数。start > end、长度不是 2 或端点非整数时抛 ValueError。忽略 start == end 的空区间，将所有重叠或首尾相接的非空区间合并，按起点升序返回列表的列表。不得修改输入，只用标准库。",
+      "entrypoint": "merge_ranges",
+      "parameters": [
+        "ranges"
+      ],
+      "public_cases": [
+        {
+          "id": "p1",
+          "args": [
+            []
+          ],
+          "expected": [],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p2",
+          "args": [
+            [
+              [
+                1,
+                5
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              1,
+              5
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p3",
+          "args": [
+            [
+              [
+                1,
+                2
+              ],
+              [
+                2,
+                4
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              1,
+              4
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p4",
+          "args": [
+            [
+              [
+                3,
+                1
+              ]
+            ]
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "h1",
+          "args": [
+            [
+              [
+                0,
+                0
+              ]
+            ]
+          ],
+          "expected": [],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h2",
+          "args": [
+            [
+              [
+                5,
+                7
+              ],
+              [
+                -2,
+                1
+              ],
+              [
+                1,
+                5
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              -2,
+              7
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h3",
+          "args": [
+            [
+              [
+                1,
+                2
+              ],
+              [
+                3,
+                4
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h4",
+          "args": [
+            [
+              [
+                1,
+                2
+              ],
+              [
+                1,
+                2
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              1,
+              2
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h5",
+          "args": [
+            [
+              [
+                false,
+                2
+              ]
+            ]
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h6",
+          "args": [
+            [
+              [
+                1,
+                2.0
+              ]
+            ]
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h7",
+          "args": [
+            [
+              [
+                1,
+                2,
+                3
+              ]
+            ]
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h8",
+          "args": [
+            [
+              [
+                1,
+                4
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                4,
+                4
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              1,
+              4
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h9",
+          "args": [
+            [
+              [
+                -5,
+                -3
+              ],
+              [
+                -3,
+                -1
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              -5,
+              -1
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h10",
+          "args": [
+            [
+              [
+                3,
+                3
+              ],
+              [
+                2,
+                4
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ]
+          ],
+          "expected": [
+            [
+              0,
+              4
+            ]
+          ],
+          "raises": null,
+          "preserve_input": true
+        }
+      ]
+    },
+    {
+      "id": "opt-runs-v1",
+      "label": "runs",
+      "task": "实现 decode_runs(text)：text 是字符串，空串返回空串；非空文本由逗号分隔的 count:char 项组成。count 是规范 ASCII 十进制正整数 1 到 100（不允许前导零）。char 必须恰好一个 Unicode 字符，冒号、逗号、反斜杠必须分别写成 \\:、\\,、\\\\；其余字符直接写，反斜杠不得转义其他字符。解码为每项 char 重复 count 次后依次拼接；总输出长度超过 1000、空项或任意语法错误均抛 ValueError。只用标准库。",
+      "entrypoint": "decode_runs",
+      "parameters": [
+        "text"
+      ],
+      "public_cases": [
+        {
+          "id": "p1",
+          "args": [
+            ""
+          ],
+          "expected": "",
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p2",
+          "args": [
+            "2:a,1:b"
+          ],
+          "expected": "aab",
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p3",
+          "args": [
+            "2:\\,"
+          ],
+          "expected": ",,",
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p4",
+          "args": [
+            "0:a"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "h1",
+          "args": [
+            "1:\\:"
+          ],
+          "expected": ":",
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h2",
+          "args": [
+            "2:\\\\"
+          ],
+          "expected": "\\\\",
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h3",
+          "args": [
+            "2:猫"
+          ],
+          "expected": "猫猫",
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h4",
+          "args": [
+            "01:a"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h5",
+          "args": [
+            "1:ab"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h6",
+          "args": [
+            "1:a,"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h7",
+          "args": [
+            "1:\\x"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h8",
+          "args": [
+            "101:a"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h9",
+          "args": [
+            "100:a,100:a,100:a,100:a,100:a,100:a,100:a,100:a,100:a,100:a,100:a"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h10",
+          "args": [
+            "1: "
+          ],
+          "expected": " ",
+          "raises": null,
+          "preserve_input": true
+        }
+      ]
+    },
+    {
+      "id": "opt-window-v1",
+      "label": "window",
+      "task": "实现 window_admit(events, limit, window)：events 是非递减的非负整数时间戳列表；limit 和 window 都是正整数，所有位置 bool 均不算整数。任意类型、范围或顺序不合法时抛 ValueError，包括尚未处理的后续事件。依次处理事件 t：先移除已接受事件中时间 <= t-window 的记录，剩余已接受事件少于 limit 时接受并记录当前 t，否则拒绝且不记录。返回逐事件的布尔值列表；相同时间戳是不同事件；不得修改输入。只用标准库。",
+      "entrypoint": "window_admit",
+      "parameters": [
+        "events",
+        "limit",
+        "window"
+      ],
+      "public_cases": [
+        {
+          "id": "p1",
+          "args": [
+            [],
+            2,
+            3
+          ],
+          "expected": [],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p2",
+          "args": [
+            [
+              0,
+              0,
+              1,
+              3
+            ],
+            2,
+            3
+          ],
+          "expected": [
+            true,
+            true,
+            false,
+            true
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p3",
+          "args": [
+            [
+              0,
+              2,
+              3
+            ],
+            1,
+            3
+          ],
+          "expected": [
+            true,
+            false,
+            true
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p4",
+          "args": [
+            [
+              2,
+              1
+            ],
+            1,
+            2
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "h1",
+          "args": [
+            [
+              0,
+              5,
+              10
+            ],
+            1,
+            5
+          ],
+          "expected": [
+            true,
+            true,
+            true
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h2",
+          "args": [
+            [
+              0,
+              0,
+              0
+            ],
+            2,
+            1
+          ],
+          "expected": [
+            true,
+            true,
+            false
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h3",
+          "args": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            2,
+            3
+          ],
+          "expected": [
+            true,
+            true,
+            false,
+            true,
+            true
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h4",
+          "args": [
+            [],
+            0,
+            1
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h5",
+          "args": [
+            [],
+            1,
+            false
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h6",
+          "args": [
+            [
+              0,
+              false
+            ],
+            1,
+            1
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h7",
+          "args": [
+            [
+              0,
+              -1
+            ],
+            1,
+            1
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h8",
+          "args": [
+            [
+              0,
+              1.5
+            ],
+            1,
+            1
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h9",
+          "args": [
+            [
+              100,
+              100,
+              101,
+              102,
+              103
+            ],
+            2,
+            2
+          ],
+          "expected": [
+            true,
+            true,
+            false,
+            true,
+            true
+          ],
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h10",
+          "args": [
+            [
+              0,
+              0,
+              0,
+              5,
+              4
+            ],
+            1,
+            10
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ]
+    },
+    {
+      "id": "opt-query-v1",
+      "label": "query",
+      "task": "实现 parse_query(text)：text 为查询字符串，可有一个开头的 ?（仅移除这一个）。按 & 分隔并忽略空片段；每片段在第一个 = 处分成键值，没有 = 时值为空串，键允许为空。键和值中 + 表示空格，% 后必须是恰好两个 ASCII 十六进制数字并作为字节解码，编码字节按严格 UTF-8 解码，不合法的百分号转义或 UTF-8 均抛 ValueError。未转义的 Unicode 字符保留。返回字典：每个键对应按出现顺序收集的值列表，保留重复项；只用标准库。",
+      "entrypoint": "parse_query",
+      "parameters": [
+        "text"
+      ],
+      "public_cases": [
+        {
+          "id": "p1",
+          "args": [
+            ""
+          ],
+          "expected": {},
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p2",
+          "args": [
+            "a=1&a=2"
+          ],
+          "expected": {
+            "a": [
+              "1",
+              "2"
+            ]
+          },
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p3",
+          "args": [
+            "?a+b=c%20d"
+          ],
+          "expected": {
+            "a b": [
+              "c d"
+            ]
+          },
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "p4",
+          "args": [
+            "x=%GG"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ],
+      "holdout_cases": [
+        {
+          "id": "h1",
+          "args": [
+            "a&b="
+          ],
+          "expected": {
+            "a": [
+              ""
+            ],
+            "b": [
+              ""
+            ]
+          },
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h2",
+          "args": [
+            "=v&&a=1=2&"
+          ],
+          "expected": {
+            "": [
+              "v"
+            ],
+            "a": [
+              "1=2"
+            ]
+          },
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h3",
+          "args": [
+            "x=%E7%8C%AB"
+          ],
+          "expected": {
+            "x": [
+              "猫"
+            ]
+          },
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h4",
+          "args": [
+            "x=%FF"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h5",
+          "args": [
+            "x=%A"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h6",
+          "args": [
+            "x=%"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        },
+        {
+          "id": "h7",
+          "args": [
+            "??a=b"
+          ],
+          "expected": {
+            "?a": [
+              "b"
+            ]
+          },
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h8",
+          "args": [
+            "x=%2B+%26%3D"
+          ],
+          "expected": {
+            "x": [
+              "+ &="
+            ]
+          },
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h9",
+          "args": [
+            "猫=好"
+          ],
+          "expected": {
+            "猫": [
+              "好"
+            ]
+          },
+          "raises": null,
+          "preserve_input": true
+        },
+        {
+          "id": "h10",
+          "args": [
+            "x=%C0%AF"
+          ],
+          "expected": null,
+          "raises": "ValueError",
+          "preserve_input": true
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "opt-ranges-v1",
+      "task_id": "opt-ranges-v1",
+      "task": "实现 merge_ranges(ranges)：输入为由两个整数构成的区间列表，每个区间表示 [start,end)，允许负数；bool 不算整数。start > end、长度不是 2 或端点非整数时抛 ValueError。忽略 start == end 的空区间，将所有重叠或首尾相接的非空区间合并，按起点升序返回列表的列表。不得修改输入，只用标准库。",
+      "source": "def merge_ranges(ranges):\n    return sorted(ranges)\n"
+    },
+    {
+      "id": "opt-runs-v1",
+      "task_id": "opt-runs-v1",
+      "task": "实现 decode_runs(text)：text 是字符串，空串返回空串；非空文本由逗号分隔的 count:char 项组成。count 是规范 ASCII 十进制正整数 1 到 100（不允许前导零）。char 必须恰好一个 Unicode 字符，冒号、逗号、反斜杠必须分别写成 \\:、\\,、\\\\；其余字符直接写，反斜杠不得转义其他字符。解码为每项 char 重复 count 次后依次拼接；总输出长度超过 1000、空项或任意语法错误均抛 ValueError。只用标准库。",
+      "source": "def decode_runs(text):\n    if not text:\n        return \"\"\n    return \"\".join(int(part.split(\":\")[0]) * part.split(\":\")[1] for part in text.split(\",\"))\n"
+    },
+    {
+      "id": "opt-window-v1",
+      "task_id": "opt-window-v1",
+      "task": "实现 window_admit(events, limit, window)：events 是非递减的非负整数时间戳列表；limit 和 window 都是正整数，所有位置 bool 均不算整数。任意类型、范围或顺序不合法时抛 ValueError，包括尚未处理的后续事件。依次处理事件 t：先移除已接受事件中时间 <= t-window 的记录，剩余已接受事件少于 limit 时接受并记录当前 t，否则拒绝且不记录。返回逐事件的布尔值列表；相同时间戳是不同事件；不得修改输入。只用标准库。",
+      "source": "def window_admit(events, limit, window):\n    return [i < limit for i in range(len(events))]\n"
+    },
+    {
+      "id": "opt-query-v1",
+      "task_id": "opt-query-v1",
+      "task": "实现 parse_query(text)：text 为查询字符串，可有一个开头的 ?（仅移除这一个）。按 & 分隔并忽略空片段；每片段在第一个 = 处分成键值，没有 = 时值为空串，键允许为空。键和值中 + 表示空格，% 后必须是恰好两个 ASCII 十六进制数字并作为字节解码，编码字节按严格 UTF-8 解码，不合法的百分号转义或 UTF-8 均抛 ValueError。未转义的 Unicode 字符保留。返回字典：每个键对应按出现顺序收集的值列表，保留重复项；只用标准库。",
+      "source": "def parse_query(text):\n    return dict(part.split(\"=\", 1) for part in text.lstrip(\"?\").split(\"&\") if part)\n"
+    }
+  ]
+}

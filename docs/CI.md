@@ -52,20 +52,14 @@ python -m venv .venv
 - `test-results-windows-python312`：JUnit 测试报告，便于记录失败与通过情况。
 - `Codelens_Pro-source`：验证后的源码 ZIP，内部顶层目录为 `Codelens_Pro/`。
 
-首次推送的提交 `bf0953c` 已核验全部云端步骤通过：[运行记录](https://github.com/KADG777/Codelens_Pro/actions/runs/39895304122)。后续提交以各自的 Actions 记录为准，本地检查不能替代云端结果。
+以当前提交对应的 Actions 记录为准，本地检查不能替代云端结果。
 
 使用的官方 Actions：[checkout](https://github.com/actions/checkout)、[setup-python](https://github.com/actions/setup-python)、[upload-artifact](https://github.com/actions/upload-artifact)。
 
-## 本地预验证（2026-10-23）
+## 验证记录与密钥检查
 
-在本项目新建的 Python 3.12.9 虚拟环境中，按上述锁定约束重新安装全部依赖。依赖冲突检查、全项目 Ruff 检查、发布文件检查通过；完整测试 **384 passed in 141.22s**，没有跳过测试。模型 API Key 为空。
+当前测试范围及最近结果见 [验证记录](VALIDATION.md)，旧版本过程保存在 [历史记录](VALIDATION_HISTORY.md)。模型复测单独运行，不能把历史 API 结果当作本次 CI 的模型测试。
 
-本地指定 `--basetemp` 时应先创建其父目录。GitHub 配置使用默认临时目录。
+本地指定 `--basetemp` 时先创建父目录；CI 使用默认临时目录。
 
-以上测试数量与耗时来自本地预验证；GitHub 的独立运行结果见上方链接。
-
-凭证检查不需要把真实密钥放进 GitHub Secrets。本机存在 `DEEPSEEK_API_KEY` 环境变量时，检查器还会对实际值做精确匹配；CI 的空密钥环境只进行格式规则检测。格式规则不能覆盖所有类型的秘密，提交前仍应保留 `.gitignore` 并检查新增文件范围。
-
-## third release 本地回归
-
-完整测试 **410 passed in 150.50s**，无跳过。新增画布和凭证检查均纳入相同 CI；模型复测另行运行，不把历史 API 结果当作本次 CI 的模型测试。
+凭证检查无需向 GitHub Secrets 提交真实密钥。本机存在 `DEEPSEEK_API_KEY` 时额外做实际值匹配；CI 在空密钥环境中进行格式规则检测。`.env`、运行数据、缓存和私人上传文件仍由发布规则排除。

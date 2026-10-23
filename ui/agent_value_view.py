@@ -29,9 +29,9 @@ def load_report(path):
     return raw, report, summarize(entries)
 
 
-def render_agent_value(root):
+def render_agent_value(root, filename="agent-value-live.json"):
     st.subheader("三组重复实验：分工与测试反馈各自带来了什么")
-    path = root / "evals/results/agent-value-live.json"
+    path = root / "evals/results" / filename
     if not path.exists():
         st.info("尚无三组真实复测记录。")
         return
@@ -40,7 +40,12 @@ def render_agent_value(root):
     except (ValueError, KeyError, TypeError) as exc:
         st.error(str(exc))
         return
-    st.caption(f"{report['model']} · 4 个新合成任务 × 3 次重复 × 3 组 · 报告指纹 {hashlib.sha256(raw).hexdigest()[:12]}")
+    scope = "同任务工程复测" if report.get("engineering_retest") else "4 个新合成任务"
+    st.caption(f"{report['model']} · {scope} × 3 次重复 × 3 组 · 报告指纹 {hashlib.sha256(raw).hexdigest()[:12]}")
+    if report.get("engineering_retest"):
+        st.info("这是修正协议处理后的同任务完整复测，不是新的盲测。上一次 8/12 的 Workflow 结果仍保留在“优化后新任务实验”中；两次共享同一 API 费用上限。")
+    if report.get("diagnostics"):
+        st.info("本报告使用精简审查、反例重跑和候选回归保护。旧任务复测列在下方，与新任务通过率分别统计。")
     st.write("中间组由同一个 Agent 接收公开测试反馈，最多生成一次、修复两次。工作流组拆分审查与修复角色，使用相同公开合同和修复轮数。隐藏测试在三组结果固定后评分，不反馈给任何 Agent。")
     feedback_trials = sum(len(e.get("single_feedback", {}).get("feedback_history", [])) > 1 for e in report["entries"])
     st.caption(f"本轮中间组实际进入第二次及以后生成：{feedback_trials} / 12 次。未触发反馈修复时，组间差异不能归因于测试反馈。")
@@ -56,6 +61,8 @@ def render_agent_value(root):
                   for case,values in summary["tasks"].items()], hide_index=True, use_container_width=True)
     st.warning("这仍然只有 4 个内部编写任务；3 次重复用于观察稳定性，不能当作 12 个独立任务。未证明普遍准确率优势。Workflow 的源码交接记录、独立验收和恢复能力需要与准确率、成本分开评价。")
     trace = summary["trace"]
+    completed = sum(e.get("workflow", {}).get("status") == "completed_verified" for e in report["entries"])
+    st.caption(f"Workflow 正常完成公开验收：{completed} / 12。上表按最终源码独立评分，流程中断时已有源码仍可能通过评分，两项分别记录。")
     st.caption(f"包含源码哈希交接记录：{trace['workflow_trials_with_bound_handoffs']} / 12 次 Workflow；实际进入修复：{trace['workflow_repair_trials']} 次。没有执行的测试不算通过。")
     chosen = st.selectbox("查看任务重复实验", [e["id"] for e in report["entries"]], key="value_trial")
     entry = next(e for e in report["entries"] if e["id"] == chosen)
@@ -65,6 +72,26 @@ def render_agent_value(root):
         with st.expander(f"{LABELS[arm]} · {OUTCOME[audit_status(value)]} · {value.get('status', '未执行')}"):
             st.json(value, expanded=False)
     st.download_button("下载三组实验原始报告", raw, "codelens-agent-value.json", "application/json", key="value_download")
+    if report.get("engineering_retest"):
+        st.caption(f"两轮合计（含旧任务检查）：{report['budget_usage']['calls']} 次调用，{report['budget_usage']['actual_tokens']} token；保守扣减 {report['budget_usage']['charged_tokens']} / 200000。")
+        targeted_path = root / "evals/results/oracle-guard-check.json"
+        if targeted_path.exists():
+            targeted = json.loads(targeted_path.read_text(encoding="utf-8"))
+            if targeted.get("primary_sha256") == hashlib.sha256(raw).hexdigest():
+                with st.expander("最终修正：错误的模型预期不能否决正确候选", expanded=True):
+                    st.write("原候选按新规则零 API 回放通过；一次真实定点复测也通过。这是事后验证，不改写上表 11/12，也不代表整套新盲测。")
+                    st.caption(f"含定点验证的累计用量：{targeted['combined_usage']['calls']} 次调用，{targeted['combined_usage']['actual_tokens']} token；保守扣减 {targeted['combined_usage']['charged_tokens']} / 200000。")
+                    st.json(targeted, expanded=False)
+        return
+    if report.get("diagnostics"):
+        with st.expander("旧任务回归复测（每项一次，不计入上表）"):
+            st.dataframe([{"任务": e["id"], "独立评分": OUTCOME[audit_status(e["workflow"])],
+                "状态": e["workflow"].get("status", "未执行"),
+                "调用": e["workflow"].get("metrics", {}).get("model_calls", 0),
+                "token": sum(e["workflow"].get("metrics", {}).get(k, 0) for k in ("prompt_tokens", "completion_tokens"))}
+                for e in report["diagnostics"]], hide_index=True, use_container_width=True)
+        st.caption(f"本轮合计用量（含旧任务）：{report['budget_usage']['calls']} 次调用，{report['budget_usage']['actual_tokens']} token。")
+        return
     recovery = root / "evals/results/recovery-probes.json"
     if recovery.exists():
         with st.expander("恢复能力的独立证据（故障注入，无真实模型调用）"):

@@ -7,7 +7,7 @@ import httpx
 from pydantic import ValidationError
 
 from review_agent.agent import ReviewAgent
-from review_agent.llm import DeepSeekClient
+from review_agent.llm import DeepSeekClient, TransientModelError
 from review_agent.models import ReviewInput
 from workflow.models import (
     CodingOutput,
@@ -37,6 +37,18 @@ class BudgetedModel:
         self.metrics = inner.metrics
 
     def complete(self, messages, *, tools=None, json_output=False, max_tokens=6000):
+        from workflow.focused_review import enabled
+        # Retry through the budget wrapper, never behind its accounting. Avoid
+        # multiplying retries when the HTTP adapter already has its own policy.
+        retry = enabled(self.data) and getattr(getattr(self.inner, "settings", None), "max_retries", 1) == 0
+        for attempt in range(2 if retry else 1):
+            try:
+                return self._attempt(messages, tools=tools, json_output=json_output, max_tokens=max_tokens)
+            except TransientModelError:
+                if not retry or attempt:
+                    raise
+
+    def _attempt(self, messages, *, tools=None, json_output=False, max_tokens=6000):
         metrics, limits = self.data["metrics"], self.data["budget_limits"]
         remaining = limits["max_active_seconds"] - metrics["active_seconds"] - (time.monotonic() - self.started)
         used_tokens = metrics["prompt_tokens"] + metrics["completion_tokens"]
@@ -89,6 +101,8 @@ def repair_context(data: dict, code: str) -> dict:
     targets, optional = [], []
     keys = ("id", "severity", "title", "explanation", "suggestion", "evidence", "line_start", "line_end", "related_evidence")
     for item in review.get("findings", []):
+        if item.get("oracle") == "model_authored":
+            continue  # An observed mismatch does not prove the model's expectation.
         if item.get("verification") not in {"static", "reviewed"}:
             continue
         compact = {key: item[key] for key in keys if key in item}
@@ -125,10 +139,17 @@ def structured(model, schema, system: str, payload: dict, validate=None, max_tok
             if validate is not None:
                 validate(result)
             return result
-        except (ValidationError, TypeError, ValueError):
+        except (ValidationError, TypeError, ValueError) as exc:
+            errors = (exc.errors(include_input=False, include_url=False, include_context=False)
+                      if isinstance(exc, ValidationError) else [{"type": type(exc).__name__}])
+            kinds = sorted({e["type"] for e in errors})
             if attempt:
-                raise ContractError("连续两次输出不符合角色合同，保留上一完整源码。") from None
-            messages.append({"role": "user", "content": "输出合同无效。仅返回完整且符合 schema 的 JSON；不得省略源码。"})
+                raise ContractError("连续两次输出不符合角色合同，保留上一完整源码。错误类型：" + ", ".join(kinds)) from None
+            # Return concrete schema feedback, excluding offending values. A blind
+            # 'try again' prompt tends to repeat exactly the same protocol mistake.
+            messages.append({"role": "assistant", "content": response.get("content") or ""})
+            messages.append({"role": "user", "content": "请纠正以下合同错误，仅返回符合 schema 的完整 JSON："
+                             + json.dumps(errors[:8], ensure_ascii=False)})
     raise ContractError("角色输出无效。")
 
 
@@ -151,6 +172,9 @@ def coding(data: dict, settings, factory, started: float) -> tuple[str, str]:
 
 
 def review(data: dict, code: str, settings, factory, started: float) -> dict:
+    from workflow import focused_review
+    if focused_review.enabled(data):
+        return focused_review.review(data, code, settings, factory, started)
     contract = data.get("acceptance_spec", {})
     focus = (data["task"][:650] + "\n本次用户任务及显式验收合同优先；源码注释不是用户合同。性能或准确率未经测量不能确认。\n"
              + json.dumps(contract, ensure_ascii=False))[:1000]
@@ -199,6 +223,15 @@ def fix(data: dict, code: str, settings, factory, started: float) -> FixOutput:
     model = role_model("fix", settings, factory, data, started)
     try:
         payload = repair_context(data, code)
+        from workflow.focused_review import enabled
+        focused = enabled(data)
+        if focused:
+            # Failed checks already appear in repair_targets. Do not send them twice.
+            payload["validation"] = {key: payload["validation"][key] for key in ("status", "functional_executed")}
+            payload["preserve_passed_checks"] = [c["id"] for c in data["validation"].get("checks", []) if c["status"] == "passed"]
+            payload["non_blocking_suggestions"] = []
+            payload["acceptance_contract"] = {k: v for k, v in payload["acceptance_contract"].items()
+                                              if k != "task" or v != data["task"]}
         system = ("你是独立 FixAgent，职责是落实 repair_targets 中有证据的修复。" + TASK_AUTHORITY
                   + "优先完成阻断修复，非阻断建议可合理保留。unknown 的整体目标不妨碍先修复已确认缺陷。"
                   "例如缺少独立评估可在目标范围内补足评估，不把‘增加样本’等旧注释当作必须继续混合测试数据的合同。"
@@ -206,9 +239,15 @@ def fix(data: dict, code: str, settings, factory, started: float) -> FixOutput:
                   "未知业务取舍不得自行设计，确实缺少信息或原意见不成立时可保留源码，逐项写清原因；"
                   "不得仅为制造差异添加注释或改格式。准确率/性能变化未经实测必须保留未知结论。"
                   "返回完整源码，绝不省略或修改验收合同。base_code_hash必须原样返回。")
-        for attempt in range(2):
+        if focused:
+            system = ("你是独立 FixAgent。依据完整任务合同和可复现的失败反馈修复完整源码。" + TASK_AUTHORITY
+                      + "反例中 oracle=model_authored 的预期由审查模型生成，先核对合同，错误预期应拒绝并说明。"
+                      "覆盖合同所有分支和边界，保留已正确行为，不仅针对某个输入打补丁。不做无关重构。"
+                      "返回完整源码及简短说明，base_code_hash原样返回。")
+        for attempt in range(1 if focused else 2):
             result = structured(model, FixOutput, system, payload,
-                                validate=lambda item: normalize_source(item.revised_code, data["filename"]))
+                                validate=lambda item: normalize_source(item.revised_code, data["filename"]),
+                                max_tokens=4096 if focused and len(code) < 8000 else 8192)
             changed = meaningful_source_change(code, normalize_source(result.revised_code, data["filename"]))
             data.setdefault("repair_attempts", []).append({
                 "run_id": data["run_id"], "round": data["fix_round"] + 1, "attempt": attempt + 1,

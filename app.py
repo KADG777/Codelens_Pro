@@ -66,6 +66,7 @@ REASONS = {
     "validation_environment": "验收环境尚不可用，可配置后继续",
     "no_progress": "修复没有产生源码变化，已停止重复尝试",
     "repeated_code": "候选源码重复历史版本，已停止循环",
+    "candidate_rejected": "候选未通过回归保护，已保留上一版本源码",
     "stale_evidence": "检查结果对应旧源码，不能判定通过",
     "fix_budget_exhausted": "已达到最多修复轮数，仍有问题未解决",
     "unresolved_review": "仍有审查意见或需求核对结果待确认",
@@ -386,6 +387,14 @@ def _render_code(snapshot: dict, trace: dict | None = None) -> None:
         st.caption(f"{name} · 当前版本 {current.get('label', current.get('id', ''))} · 已保存 {len(versions)} 个版本")
         no_progress = snapshot.get("termination_reason") in {"no_progress", "repeated_code"}
         repairs = snapshot.get("repair_records") or []
+        if snapshot.get("termination_reason") == "candidate_rejected":
+            st.warning("候选修复破坏了已通过的检查，或复验未完成；当前源码保留上一版本。")
+            with st.expander("查看未采用的候选与复验依据"):
+                last = repairs[-1] if repairs else {}
+                st.write("退化的用例：" + "、".join(last.get("regressed_checks", [])))
+                st.json(last.get("candidate_validation", {}), expanded=False)
+                st.json(last.get("candidate_probes", {}), expanded=False)
+                st.code(last.get("revised_code", ""), language="python")
         if no_progress:
             st.warning("本轮修复未生效：没有保存新的源码版本。下面仍展示真实的修改前后源码。")
             if repairs:
@@ -449,6 +458,17 @@ def _render_review(snapshot: dict) -> None:
     if review.get("code_hash") != current.get("hash"):
         st.warning("这份审查对应之前的版本；当前源码需要重新审查。")
     st.write(review.get("summary") or "审查已保存。")
+    if review.get("strategy") == "focused":
+        probe_execution = review.get("probe_execution", {})
+        checks = probe_execution.get("checks", [])
+        st.caption("审查方式：" + ("重跑已保存反例，本轮审查未调用模型" if review.get("replayed") else "一次模型审查 + 隔离执行反例"))
+        st.caption("反例预期由模型提出，需人工核对；不能据此强制改码或否决通过独立检查的候选。独立冻结验收另行展示。")
+        if checks:
+            st.dataframe([{"反例": c["id"], "结果": CHECK_STATUS.get(c["status"], c["status"]),
+                           "输入": str(c["args"]), "预期": str(c["expected"]), "实际": str(c["actual"]),
+                           "异常": ", ".join(c.get("exceptions", []))} for c in checks], hide_index=True, use_container_width=True)
+        if probe_execution.get("error"):
+            st.warning(probe_execution["error"])
     findings = review.get("findings") or []
     pending = review.get("pending_findings") or []
     if review.get("complete") and not findings and not pending:
@@ -462,7 +482,9 @@ def _render_review(snapshot: dict) -> None:
                     st.write(f"**{label}**")
                     st.write(finding[key])
             line = finding.get("line_start", finding.get("line"))
-            if line:
+            if finding.get("oracle") == "model_authored":
+                st.caption("证据定位：入口函数反例，非单行静态诊断。")
+            elif line:
                 st.caption(f"定位：第 {line} 行")
     if pending:
         st.warning(f"还有 {len(pending)} 条待确认意见，不能据此宣称全部通过。")
@@ -471,6 +493,8 @@ def _render_review(snapshot: dict) -> None:
                 st.write(item.get("explanation") or item.get("reason") or "请核对原始条件和证据。")
     if review.get("requirements_status"):
         requirements = {"met": "已满足显式要求", "gap": "发现需求差距", "unknown": "尚无法确认", "not_evaluated": "预设流程未进行通用需求语义判断"}
+        if review.get("strategy") == "focused":
+            requirements["met"] = "本次核对范围未见剩余差距"
         requirement_status = review["requirements_status"]
         unmeasured_history = requirement_status == "met" and requires_measured_evidence(snapshot.get("task", ""))
         if unmeasured_history:
@@ -622,6 +646,9 @@ def _render_run(service: WorkflowRunService, snapshot: dict, settings: Settings,
             source = f"继承自 {str(repair.get('source_run_id', parent or ''))[:8]}" if repair.get("inherited") else "本轮"
             with st.expander(f"{source} · 修复 Agent · 第 {repair.get('round', '?')} 轮交接", expanded=not repair.get("inherited")):
                 st.write(repair.get("change_summary", "完整源码已保存。"))
+                if "adopted" in repair:
+                    st.caption("候选已通过回归保护并采用" if repair["adopted"] else "候选未采用；保留上一版本")
+                    st.json({key: repair[key] for key in ("candidate_validation", "candidate_probes", "regressed_checks") if key in repair}, expanded=False)
                 st.caption(f"改前源码标识：{str(repair.get('base_code_hash', ''))[:12]} · 对应审查问题：{'、'.join(repair.get('addressed_finding_ids', [])) or '无'}")
                 if repair.get("unresolved_items"):
                     st.write(repair["unresolved_items"])

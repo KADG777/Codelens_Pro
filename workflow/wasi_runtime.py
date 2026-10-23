@@ -150,7 +150,9 @@ def _internal_execute_function(code: str, entrypoint: str, inputs: list[dict], *
         (work / "runner.py").write_text(_caller_source(entrypoint, inputs, marker), encoding="utf-8")
         with wasmtime.Store(engine) as store:
             store.set_limits(memory_size=256 * 1024 * 1024, instances=2, memories=1)
-            store.set_fuel(2_000_000_000)
+            # Standard-library imports (e.g. urllib.parse) can exceed the old cap.
+            # The wall-clock deadline and 256 MiB memory cap remain independent.
+            store.set_fuel(10_000_000_000)
             store.set_epoch_deadline(max(1, math.ceil(max(0.1, timeout) / 0.05)))
             wasi = wasmtime.WasiConfig()
             wasi.argv = ["/python/python.wasm", "-B", "-s", "-P", "/workspace/runner.py"]

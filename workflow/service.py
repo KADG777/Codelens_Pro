@@ -348,6 +348,10 @@ class WorkflowRunService:
             expected_contract = get_acceptance_hash(data["acceptance_id"])
             if data["acceptance_hash"] != expected_contract:
                 raise agents.ContractError("验收用例版本已变化，旧运行不使用新合同；请建立新运行。")
+            if (data.get("validation", {}).get("code_hash") == item["hash"]
+                    and data["validation"].get("status") in {"passed", "failed"}):
+                data["next_node"] = self._after_inspection(data)
+                return
             remaining = data["budget_limits"]["max_active_seconds"] - data["metrics"]["active_seconds"]
             outcome = self.validation_runner(item["code"], item["hash"], data["validation_profile"],
                                              data["acceptance_id"], timeout=max(0.1, min(10, remaining)))
@@ -390,6 +394,38 @@ class WorkflowRunService:
             if any(old["hash"] == revised["hash"] for old in data["versions"]):
                 data.update(status="needs_attention", termination_reason="repeated_code")
                 data["unresolved"].append("候选重复历史代码，停止循环。")
+                return
+            from workflow.focused_review import enabled, execute_probes, lost_passes
+            if enabled(data):
+                # Stage the candidate separately. Current source changes only after this guard.
+                candidate = copy.deepcopy(data)
+                candidate["versions"].append(revised)
+                candidate["current_version"] = revised["id"]
+                self._perform("validate", candidate, settings, started)
+                checks = candidate["validation"]
+                probes = data["review"].get("probes", [])
+                remaining = data["budget_limits"]["max_active_seconds"] - data["metrics"]["active_seconds"] - (time.monotonic() - started)
+                probe_checks = execute_probes(code, data["acceptance_spec"]["entrypoint"], probes,
+                                              timeout=max(.1, min(10, remaining)))
+                regressions = lost_passes(data["validation"], checks)
+                probe_regressions = lost_passes(data["review"].get("probe_execution", {}), probe_checks)
+                # Model-authored expectations are not an independent oracle and
+                # must not veto a valid repair. Retain them for human review.
+                unavailable = checks["status"] == "error"
+                record.update(candidate_hash=revised["hash"], candidate_validation=checks,
+                              candidate_probes=probe_checks, regressed_checks=regressions,
+                              advisory_probe_regressions=probe_regressions,
+                              adopted=not (regressions or unavailable))
+                if regressions or unavailable:
+                    data.update(status="needs_attention", termination_reason="candidate_rejected")
+                    data["unresolved"] = ["候选未更新当前源码：" + (
+                        "破坏已通过用例 " + ", ".join(regressions) if regressions else "候选复验未完成")]
+                    return
+                # Keep source-bound independent checks, avoiding a duplicate sandbox run.
+                data["validation_history"].append(checks)
+                data["versions"].append(revised)
+                data.update(current_version=revised["id"], review={}, validation=checks,
+                            next_node=self._inspection_node(data))
                 return
             data["versions"].append(revised)
             data.update(current_version=revised["id"], review={}, validation={}, next_node=self._inspection_node(data))
@@ -482,11 +518,13 @@ class WorkflowRunService:
             data.update(status="needs_attention", termination_reason="stale_evidence")
             data["unresolved"] = ["审查或验证不对应当前源码，拒绝判定通过。"]
             return
-        blockers = [entry["title"] for entry in review.get("findings", []) if entry["severity"] in {"high", "medium"}]
+        blockers = [entry["title"] for entry in review.get("findings", [])
+                    if entry["severity"] in {"high", "medium"} and entry.get("oracle") != "model_authored"]
         blockers.extend(entry["detail"] for entry in validation.get("checks", []) if entry["status"] == "failed")
         if review.get("requirements_status") == "gap":
             blockers.append(review.get("requirements_reason", "存在需求缺口。"))
         uncertain = [entry["title"] for entry in review.get("pending_findings", []) if entry["severity"] in {"high", "medium"}]
+        uncertain.extend(entry["title"] for entry in review.get("findings", []) if entry.get("oracle") == "model_authored")
         if not review.get("complete"):
             uncertain.append("审查未完整完成或模型复核失败。")
         if review.get("requirements_status") == "unknown":

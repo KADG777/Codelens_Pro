@@ -13,6 +13,10 @@ class ModelError(RuntimeError):
     pass
 
 
+class TransientModelError(ModelError):
+    """A transport failure eligible for a bounded, budgeted node retry."""
+
+
 class ChatModel(Protocol):
     metrics: Metrics
 
@@ -72,7 +76,7 @@ class DeepSeekClient:
                 if attempt < self.settings.max_retries:
                     time.sleep(0.5 * 2**attempt)
                     continue
-                raise ModelError(
+                raise TransientModelError(
                     "无法连接 DeepSeek 或请求超时，请检查网络和 API 地址后重试。"
                 ) from None
             if response.status_code in retryable and attempt < self.settings.max_retries:
@@ -88,6 +92,8 @@ class DeepSeekClient:
                     429: "请求过于频繁，请稍后重试。",
                 }
                 detail = messages_by_status.get(response.status_code, "服务暂不可用，请稍后重试。")
+                if response.status_code in retryable:
+                    raise TransientModelError(f"DeepSeek HTTP {response.status_code}：{detail}")
                 raise ModelError(f"DeepSeek HTTP {response.status_code}：{detail}")
             try:
                 body = response.json()

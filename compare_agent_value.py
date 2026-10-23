@@ -62,13 +62,13 @@ def run_feedback(case, settings, factory, validator=validate_code):
             "metrics": {k: getattr(model.metrics, k, 0) for k in ("model_calls", "http_attempts", "prompt_tokens", "completion_tokens")}}
 
 
-def run_collaboration(case, settings, factory, db_path):
+def run_collaboration(case, settings, factory, db_path, *, review_strategy="full", limits=None):
     started = time.perf_counter()
     service = WorkflowRunService(db_path, model_factory=factory)
     try:
         run_id = service.create_run(case["task"], source=case.get("source"), mode="live", acceptance_id=case["task_id"],
-            validation_profile="functional_portable", workflow_config={"parallel_checks": True},
-            budget_limits={"max_model_calls": PER_ARM_CALLS, "max_tokens": PER_ARM_TOKENS, "max_active_seconds": PER_ARM_SECONDS})
+            validation_profile="functional_portable", workflow_config={"parallel_checks": True, "review_strategy": review_strategy},
+            budget_limits=limits or {"max_model_calls": PER_ARM_CALLS, "max_tokens": PER_ARM_TOKENS, "max_active_seconds": PER_ARM_SECONDS})
         data = service.execute(run_id, settings=settings)
     finally:
         service.close()
