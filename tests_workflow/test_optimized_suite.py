@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from compare_agent_value import summarize
-from compare_workflows import audit_status, load_suite
+from scripts.experiments.compare_agent_value import summarize
+from scripts.experiments.compare_workflows import audit_status, load_suite
 from workflow.validation import audit_execute
 
 ROOT = Path(__file__).resolve().parents[1]

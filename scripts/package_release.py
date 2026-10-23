@@ -6,7 +6,7 @@ import json
 import zipfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 EXCLUDED_DIRS = {
     ".git", ".venv", "__pycache__", ".pytest_cache", ".ruff_cache", ".test-tmp",
     "data", "reports", "dist",

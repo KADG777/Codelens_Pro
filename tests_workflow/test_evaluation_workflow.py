@@ -5,8 +5,8 @@ import json
 
 import pytest
 
-from evaluate_workflow import _audit, load_cases, run_evaluation, summarize
 from review_agent.config import Settings
+from scripts.evaluation.evaluate_workflow import _audit, load_cases, run_evaluation, summarize
 from workflow.models import source_hash
 from workflow.registry import get_task_spec
 

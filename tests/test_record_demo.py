@@ -2,7 +2,7 @@ import json
 
 from test_agent import ScriptedClient, draft_response, tool_response
 
-from record_demo import RecordingClient, save_record
+from scripts.demo.record_demo import RecordingClient, save_record
 
 
 def test_recorder_keeps_public_tool_protocol_and_omits_hidden_reasoning():

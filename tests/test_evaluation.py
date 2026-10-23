@@ -1,6 +1,6 @@
 import pytest
 
-from score_evaluation import score_run
+from scripts.evaluation.score_evaluation import score_run
 
 
 def fixture():

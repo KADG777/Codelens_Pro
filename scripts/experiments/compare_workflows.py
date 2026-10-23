@@ -9,9 +9,9 @@ from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
-from evaluate_workflow import _audit
 from review_agent.config import Settings
 from review_agent.llm import DeepSeekClient
+from scripts.evaluation.evaluate_workflow import _audit
 from workflow import WorkflowRunService
 from workflow.agents import TASK_AUTHORITY, BudgetExceeded
 from workflow.models import CodingOutput, normalize_source, source_hash
@@ -25,7 +25,7 @@ from workflow.registry import (
 from workflow.storage import replace_report
 from workflow.validation import audit_execute
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 ARMS = ("direct", "workflow")
 
 

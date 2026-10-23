@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from package_release import source_files  # noqa: E402
+from scripts.package_release import source_files  # noqa: E402
 
 KEY_PATTERN = re.compile(rb"(?<![A-Za-z0-9])sk-[A-Za-z0-9_-]{24,}")
 

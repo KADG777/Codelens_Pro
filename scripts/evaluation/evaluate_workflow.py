@@ -23,7 +23,7 @@ from workflow.models import source_hash
 from workflow.registry import build_harness, get_task_spec
 from workflow.storage import replace_report
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CASES = ROOT / "evals" / "workflow_cases.json"
 EVALUATION_MODES = ("offline_smoke", "real_live")
 

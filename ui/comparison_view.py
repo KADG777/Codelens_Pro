@@ -7,7 +7,7 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
-from compare_workflows import ARMS, audit_status, summarize_pairs
+from scripts.experiments.compare_workflows import ARMS, audit_status, summarize_pairs
 from ui.diff_view import build_side_by_side_html
 
 
@@ -32,7 +32,7 @@ def render_comparison(root: Path):
     path = root / "evals/results/paired-live.json"
     st.subheader("同任务：直接处理与完整工作流")
     if not path.is_file():
-        st.info("尚未保存同任务对照实验。运行 compare_workflows.py 后，这里展示实际结果。")
+        st.info("尚未保存同任务对照实验。可按 scripts/README.md 中的实验说明生成报告。")
         return
     try:
         raw = path.read_bytes()

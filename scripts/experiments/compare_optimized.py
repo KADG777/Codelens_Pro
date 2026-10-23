@@ -7,12 +7,18 @@ from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
-from compare_agent_value import ARMS, run_collaboration, run_feedback, summarize
-from compare_workflows import ExperimentBudget, _audits, audit_status, load_suite, run_direct
 from review_agent.config import Settings
+from scripts.experiments.compare_agent_value import ARMS, run_collaboration, run_feedback, summarize
+from scripts.experiments.compare_workflows import (
+    ExperimentBudget,
+    _audits,
+    audit_status,
+    load_suite,
+    run_direct,
+)
 from workflow.storage import replace_report
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "evals/results/optimized-live.json"
 LIMITS = {"max_model_calls": 8, "max_tokens": 16_000, "max_active_seconds": 240.0}
 
@@ -42,7 +48,7 @@ def run(output=OUTPUT, prior_path=None):
             "diagnostics": "four previously observed tasks, one workflow run each; not new-task evidence",
             "limitations": "four internally authored tasks; repeats are not independent tasks; model-authored probe oracles may be wrong"},
         "implementation_sha256": {str(p.relative_to(ROOT)).replace("\\", "/"): hashlib.sha256(p.read_bytes()).hexdigest()
-            for p in [Path(__file__), ROOT / "compare_agent_value.py", ROOT / "compare_workflows.py", ROOT / "review_agent/llm.py", *sorted((ROOT / "workflow").glob("*.py"))]},
+            for p in [Path(__file__), ROOT / "scripts/experiments/compare_agent_value.py", ROOT / "scripts/experiments/compare_workflows.py", ROOT / "review_agent/llm.py", *sorted((ROOT / "workflow").glob("*.py"))]},
         "diagnostics": [] if prior else [{**c, "workflow": {}} for c in old["cases"]],
         "entries": [{**c, "case_id": c["id"], "id": f"{c['id']}-r{r+1}", "repeat": r+1,
             "initial": {"code": c.get("source")}, **{a: {} for a in ARMS}} for r in range(3) for c in suite["cases"]]}

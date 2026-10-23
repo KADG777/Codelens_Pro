@@ -10,13 +10,13 @@ from pathlib import Path, PurePosixPath
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from package_release import source_files  # noqa: E402
+from scripts.package_release import source_files  # noqa: E402
 from workflow.wasi_runtime import ARCHIVE_NAME, ARCHIVE_SHA256, runtime_available  # noqa: E402
 
 REQUIRED = {
     "app.py", ".github/workflows/ci.yml", ".gitignore", ".env.example",
     "requirements-dev.txt", "requirements-lock.txt", "README.md",
-    "docs/CI.md", "scripts/check_distribution.py",
+    "docs/CI.md", "scripts/check_distribution.py", "scripts/package_release.py",
     "start.cmd", "install.cmd", "sandbox_runtime/LICENSE",
     "ui/canvas_component/index.html",
     f"sandbox_runtime/{ARCHIVE_NAME}",

@@ -6,10 +6,15 @@ from threading import Event, Thread
 
 import pytest
 
-from compare_agent_value import ARMS, run_feedback, summarize
-from compare_workflows import ExperimentBudget, _audits, audit_status, load_suite
 from review_agent.config import Settings
 from review_agent.models import Metrics
+from scripts.experiments.compare_agent_value import ARMS, run_feedback, summarize
+from scripts.experiments.compare_workflows import (
+    ExperimentBudget,
+    _audits,
+    audit_status,
+    load_suite,
+)
 from workflow.agents import BudgetExceeded
 from workflow.models import source_hash
 

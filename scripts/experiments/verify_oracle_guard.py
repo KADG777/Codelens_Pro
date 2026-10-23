@@ -9,13 +9,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
-from compare_agent_value import run_collaboration
-from compare_workflows import ExperimentBudget, _audits, audit_status, load_suite
 from review_agent.config import Settings
+from scripts.experiments.compare_agent_value import run_collaboration
+from scripts.experiments.compare_workflows import (
+    ExperimentBudget,
+    _audits,
+    audit_status,
+    load_suite,
+)
 from workflow.models import FixOutput, current_artifact
 from workflow.service import WorkflowRunService
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "evals/results/oracle-guard-check.json"
 
 

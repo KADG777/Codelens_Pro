@@ -8,7 +8,8 @@ from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
-from compare_workflows import (
+from review_agent.config import Settings
+from scripts.experiments.compare_workflows import (
     ExperimentBudget,
     _audits,
     audit_status,
@@ -16,13 +17,12 @@ from compare_workflows import (
     load_suite,
     run_direct,
 )
-from review_agent.config import Settings
 from workflow import WorkflowRunService
 from workflow.models import CodingOutput, normalize_source, source_hash
 from workflow.storage import replace_report
 from workflow.validation import validate_code
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 ARMS = ("direct", "single_feedback", "workflow")
 PER_ARM_CALLS, PER_ARM_TOKENS, PER_ARM_SECONDS = 18, 40_000, 240.0
 
@@ -125,7 +125,7 @@ def run_experiment(suite_path, output, db_path, settings, max_calls=180, max_tok
             "timing": "arm wall time including internal checks; excludes final common grading",
             "limitations": "4 internally authored synthetic tasks; repeats are not independent tasks; no universal superiority claim"},
         "implementation_sha256": {str(p.relative_to(ROOT)).replace("\\", "/"): hashlib.sha256(p.read_bytes()).hexdigest()
-                                  for p in [Path(__file__).resolve(), ROOT / "compare_workflows.py", *sorted((ROOT / "workflow").glob("*.py"))]},
+                                  for p in [Path(__file__).resolve(), ROOT / "scripts/experiments/compare_workflows.py", *sorted((ROOT / "workflow").glob("*.py"))]},
         "entries": [{**case, "case_id": case["id"], "id": f"{case['id']}-r{repeat+1}", "repeat": repeat+1,
                      "initial": {"code": case.get("source")}, **{a: {} for a in ARMS}}
                     for repeat in range(3) for case in suite["cases"]]}

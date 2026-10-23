@@ -86,7 +86,7 @@
 以下命令复现第三版完整审查策略；第四版实验入口见上文链接。已有报告不能覆盖。配置本机环境变量后，可使用新报告路径运行：
 
 ```powershell
-.\.venv\Scripts\python.exe compare_agent_value.py --output reports/new-agent-value-trial.json --db reports/new-agent-value-trial.sqlite3 --max-calls 180 --max-tokens 500000
+.\.venv\Scripts\python.exe -m scripts.experiments.compare_agent_value --output reports/new-agent-value-trial.json --db reports/new-agent-value-trial.sqlite3 --max-calls 180 --max-tokens 500000
 ```
 
 运行会调用模型并产生费用。任务集与实现文件 SHA-256 保存于报告；实际模型服务、负载、缓存和网络变化可能影响结果。本次运行的模型执行路径采用标准并行模板，画布调度机制由单独的自动化和界面测试验证。

@@ -5,8 +5,8 @@ import json
 
 import streamlit as st
 
-from compare_agent_value import ARMS, summarize
-from compare_workflows import audit_status
+from scripts.experiments.compare_agent_value import ARMS, summarize
+from scripts.experiments.compare_workflows import audit_status
 
 LABELS = {"direct": "单次直接处理", "single_feedback": "单 Agent + 测试修复", "workflow": "多 Agent Workflow"}
 OUTCOME = {"passed": "通过", "failed": "失败", "unavailable": "未验证"}

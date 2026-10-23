@@ -58,7 +58,7 @@ jobs:
       - name: Run complete tests without a model API key
         run: .\.venv\Scripts\python.exe -m pytest tests tests_workflow -q --junitxml=reports/tests.xml
       - name: Build source archive
-        run: .\.venv\Scripts\python.exe package_release.py --output dist/Codelens_Pro.zip
+        run: .\.venv\Scripts\python.exe -m scripts.package_release --output dist/Codelens_Pro.zip
       - name: Verify archive contents and checksums
         run: .\.venv\Scripts\python.exe scripts/check_distribution.py --archive dist/Codelens_Pro.zip
       - name: Reject credentials in release archive

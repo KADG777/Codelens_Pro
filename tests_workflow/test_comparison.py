@@ -3,15 +3,15 @@ from copy import deepcopy
 
 import pytest
 
-from compare_workflows import (
+from review_agent.config import Settings
+from review_agent.models import Metrics
+from scripts.experiments.compare_workflows import (
     ExperimentBudget,
     audit_status,
     direct_messages,
     run_direct,
     summarize_pairs,
 )
-from review_agent.config import Settings
-from review_agent.models import Metrics
 from workflow.agents import BudgetExceeded
 from workflow.models import source_hash
 from workflow.registry import get_task_spec

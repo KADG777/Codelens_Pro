@@ -13,7 +13,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 def test_release_archive_preserves_launchers_and_matches_manifest(tmp_path):
     archive_path = tmp_path / "release.zip"
     completed = subprocess.run(
-        [sys.executable, str(PROJECT / "package_release.py"), "--output", str(archive_path)],
+        [sys.executable, str(PROJECT / "scripts/package_release.py"), "--output", str(archive_path)],
         cwd=tmp_path,
         capture_output=True,
         timeout=30,

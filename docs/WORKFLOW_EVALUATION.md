@@ -38,7 +38,7 @@
 在项目目录使用已安装依赖的 Python：
 
 ```powershell
-.\.venv\Scripts\python.exe evaluate_workflow.py --mode offline_smoke --db reports/workflow-smoke.sqlite3 --output reports/workflow-smoke.json
+.\.venv\Scripts\python.exe -m scripts.evaluation.evaluate_workflow --mode offline_smoke --db reports/workflow-smoke.sqlite3 --output reports/workflow-smoke.json
 ```
 
 `offline_smoke` 注入固定编码、审查和修复响应，明确标为离线；`actual_model_calls` 和真实 token 均为 0。它可以配合真实隔离执行器检查评测链路，但其模型产物不能算真实模型质量成绩。为复用在线角色接口，内部工作流状态使用注入模型的运行路径；应以评测报告的 `evaluation_mode` 为准，不将烟测数据库作为真实 API 记录展示。
@@ -46,7 +46,7 @@
 具备可用模型配置和隔离执行环境后，真实评测命令为：
 
 ```powershell
-.\.venv\Scripts\python.exe evaluate_workflow.py --mode real_live --max-total-model-calls 60 --max-total-tokens 300000 --db reports/workflow-live.sqlite3 --output reports/workflow-live.json
+.\.venv\Scripts\python.exe -m scripts.evaluation.evaluate_workflow --mode real_live --max-total-model-calls 60 --max-total-tokens 300000 --db reports/workflow-live.sqlite3 --output reports/workflow-live.json
 ```
 
 真实模式会发送这份公开合成任务集的任务与代码并产生 API 用量，不会提交用户此前的脚本。可使用 `--select orders_generate,text_stats_generate` 选择子集。默认独立执行器为 `workflow.validation.audit_execute`；也可用 `--audit-executor trusted.module:function` 接入项目认可的隔离适配器，不能接入在宿主直接执行候选的实现。
@@ -115,4 +115,4 @@ orders_generate,text_stats_generate,clamp_bounds_and_exception,merge_intervals_w
 
 ## 同任务配对实验已补齐
 
-2026-10-17 新增 `compare_workflows.py` 与冻结清单 `evals/paired_cases.json`。8 对真实同模型输入对照包含 4 个此前未使用的新合成合同，两组均 8/8 通过、0 回归；完整工作流成本显著更高。方法、局限、总量和分组结果见 [PAIRED_COMPARISON.md](PAIRED_COMPARISON.md)。这与上文“初稿→修复后”的开发评测是两个不同实验，不混用分母。
+2026-10-17 新增 `scripts/experiments/compare_workflows.py` 与冻结清单 `evals/paired_cases.json`。8 对真实同模型输入对照包含 4 个此前未使用的新合成合同，两组均 8/8 通过、0 回归；完整工作流成本显著更高。方法、局限、总量和分组结果见 [PAIRED_COMPARISON.md](PAIRED_COMPARISON.md)。这与上文“初稿→修复后”的开发评测是两个不同实验，不混用分母。

@@ -38,7 +38,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe scripts/check_distribution.py
 .\.venv\Scripts\python.exe scripts/check_secrets.py --history
 .\.venv\Scripts\python.exe -m pytest tests tests_workflow -q --junitxml=reports/tests.xml
-.\.venv\Scripts\python.exe package_release.py --output dist/Codelens_Pro.zip
+.\.venv\Scripts\python.exe -m scripts.package_release --output dist/Codelens_Pro.zip
 .\.venv\Scripts\python.exe scripts/check_distribution.py --archive dist/Codelens_Pro.zip
 .\.venv\Scripts\python.exe scripts/check_secrets.py --archive dist/Codelens_Pro.zip
 ```

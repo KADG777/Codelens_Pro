@@ -82,10 +82,11 @@ flowchart LR
 | `evals/` | 冻结任务集与可公开实验结果 |
 | `tests/`、`tests_workflow/` | 离线回归和真实隔离执行测试 |
 | `sandbox_runtime/` | 固定版本的便携 WASI 解释器及许可证 |
-| `scripts/`、`.github/workflows/` | 发布检查与 CI |
-| `compare_optimized.py` | 优化后对照实验，拒绝覆盖已有报告 |
+| `scripts/`、`.github/workflows/` | 分类工具、发布检查与 CI，入口见 [工具说明](scripts/README.md) |
 
 `data/`、`reports/`、`.venv/` 为本地运行目录，不进入 Git 或发布包。
+
+根目录的 Python 入口为 `app.py`。评测、实验、演示和打包工具已归入 `scripts/`；原版审查工作区由 `pages/1_原版代码审查.py` 直接提供。在项目根目录用 `python -m scripts.…` 运行工具，正常启动仍使用 `start.cmd`。
 
 ## 范围与进一步阅读
 

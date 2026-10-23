@@ -16,7 +16,7 @@ def test_web_followup_shows_validation_status_and_history(blocked):
         ReviewAgent().review(request).model_copy(update={"mode": "deepseek", "model": "test-model"})
     )
     app = AppTest.from_file(
-        str(Path(__file__).resolve().parents[1] / "legacy_review.py"), default_timeout=30
+        str(Path(__file__).resolve().parents[1] / "pages/1_原版代码审查.py"), default_timeout=30
     ).run()
     app.text_area(key="editor").set_value(request.code)
     app.text_input(key="filename").set_value(request.filename)
@@ -44,7 +44,7 @@ def test_web_followup_shows_validation_status_and_history(blocked):
 
 def test_web_demo_review_and_changed_source_notice():
     app = AppTest.from_file(
-        str(Path(__file__).resolve().parents[1] / "legacy_review.py"), default_timeout=30
+        str(Path(__file__).resolve().parents[1] / "pages/1_原版代码审查.py"), default_timeout=30
     ).run()
     assert not app.exception
     next(button for button in app.button if button.label == "开始审查 →").click().run()
@@ -60,7 +60,7 @@ def test_web_demo_review_and_changed_source_notice():
 
 def test_web_missing_key_is_actionable():
     app = AppTest.from_file(
-        str(Path(__file__).resolve().parents[1] / "legacy_review.py"), default_timeout=30
+        str(Path(__file__).resolve().parents[1] / "pages/1_原版代码审查.py"), default_timeout=30
     ).run()
     app.radio(key="mode").set_value("DeepSeek API").run()
     app.text_input(key="api_key").set_value("").run()
@@ -71,7 +71,7 @@ def test_web_missing_key_is_actionable():
 
 def test_web_cpp_example_and_switch_back_to_python():
     app = AppTest.from_file(
-        str(Path(__file__).resolve().parents[1] / "legacy_review.py"), default_timeout=30
+        str(Path(__file__).resolve().parents[1] / "pages/1_原版代码审查.py"), default_timeout=30
     ).run()
     app.selectbox(key="example_language").set_value("C++").run()
     next(button for button in app.button if button.label == "载入问题示例").click().run()
@@ -94,7 +94,7 @@ def test_web_pending_claim_shares_list_and_retains_pending_label():
     request = ReviewInput(code="value = 1 / 0\n", filename="sample.py")
     report = ReviewAgent(ScriptedClient([draft_response([finding()])])).review(request, "direct")
     app = AppTest.from_file(
-        str(Path(__file__).resolve().parents[1] / "legacy_review.py"), default_timeout=30
+        str(Path(__file__).resolve().parents[1] / "pages/1_原版代码审查.py"), default_timeout=30
     ).run()
     app.text_area(key="editor").set_value(request.code)
     app.text_input(key="filename").set_value(request.filename)
@@ -119,7 +119,7 @@ def test_web_and_markdown_expose_source_bound_computation():
     assert "[40, 20, 3]" in exported and "empty=False" in exported
     assert "各阶段开销" in exported
     app = AppTest.from_file(
-        str(Path(__file__).resolve().parents[1] / "legacy_review.py"), default_timeout=30
+        str(Path(__file__).resolve().parents[1] / "pages/1_原版代码审查.py"), default_timeout=30
     ).run()
     app.text_area(key="editor").set_value(request.code)
     app.text_input(key="filename").set_value(request.filename)
@@ -143,7 +143,7 @@ def test_web_shows_both_preprocessing_citations_and_trigger():
     )
     report.findings = [ReviewedFinding(**item.model_dump(), verification="reviewed")]
     app = AppTest.from_file(
-        str(Path(__file__).resolve().parents[1] / "legacy_review.py"), default_timeout=30
+        str(Path(__file__).resolve().parents[1] / "pages/1_原版代码审查.py"), default_timeout=30
     ).run()
     app.text_area(key="editor").set_value(request.code)
     app.text_input(key="filename").set_value(request.filename)

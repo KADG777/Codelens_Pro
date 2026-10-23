@@ -59,6 +59,6 @@
 
 全部新增实验及定点验证共 **119 次调用、184,204 已报告 token**；无用量返回的请求按预留额保守扣减，合计 **191,320 token**。用户授权初始为 120 次 / 200,000 token，后续只将调用上限调整至 140 次；token 上限始终未变。没有提交 API Key，CI 不运行真实模型实验。
 
-`compare_optimized.py`、`compare_optimized.py --retest`、`verify_oracle_guard.py` 分别对应上述阶段，均拒绝覆盖已存在的报告。重新实验应使用独立输出和新的明确费用授权；不要删除原报告以筛选成绩。
+`python -m scripts.experiments.compare_optimized`、`python -m scripts.experiments.compare_optimized --retest`、`python -m scripts.experiments.verify_oracle_guard` 分别对应上述阶段，均拒绝覆盖已存在的报告。重新实验应使用独立输出和新的明确费用授权；不要删除原报告以筛选成绩。
 
 简单、合同充分的任务中，现有数据支持单 Agent + 测试作为经济基线。需要交接追踪、独立检查、候选保护和故障恢复时，Workflow 提供这些工程能力，但必须同时展示其额外开销。四个内部合成任务与三次重复不足以证明外部项目上的泛化优势。

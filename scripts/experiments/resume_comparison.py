@@ -6,11 +6,16 @@ from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
-from compare_workflows import ExperimentBudget, _audits, audit_status, load_suite
 from review_agent.config import Settings
+from scripts.experiments.compare_workflows import (
+    ExperimentBudget,
+    _audits,
+    audit_status,
+    load_suite,
+)
 from workflow import WorkflowRunService
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def main():

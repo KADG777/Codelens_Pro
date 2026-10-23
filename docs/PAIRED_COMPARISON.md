@@ -39,7 +39,7 @@
 ## 复现
 
 ```powershell
-python compare_workflows.py --output reports/paired-repeat.json --db reports/paired-repeat.sqlite3 --max-calls 96 --max-tokens 220000
+python -m scripts.experiments.compare_workflows --output reports/paired-repeat.json --db reports/paired-repeat.sqlite3 --max-calls 96 --max-tokens 220000
 ```
 
 会调用真实 API 并产生费用；需要自己的 `.env`。原报告不允许覆盖。新运行应保留独立路径和全部结果。评测页“同任务对照实验”从打包的报告重算统计，不依赖本机私有数据库。
